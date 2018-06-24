@@ -8,7 +8,7 @@ using UnityEngine;
 /// Based off https://forum.unity.com/threads/how-to-save-manually-save-a-png-of-a-camera-view.506269/
 /// and https://answers.unity.com/questions/22954/how-to-save-a-picture-take-screenshot-from-a-camer.html
 /// </summary>
-public class CameraPNGSaver : MonoBehaviour {
+public class ViewRecorder : MonoBehaviour {
 
     protected Camera cam;
 

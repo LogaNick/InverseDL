@@ -7,7 +7,7 @@ using UnityEngine;
 /// 
 /// Put this on any object you want labels for.
 /// </summary>
-public class RecordObject : MonoBehaviour {
+public class ObjectRecorder : MonoBehaviour {
 
     // Mostly for testing, recording this transform's data and reverting to it later
     public ObjectRecord cachedRecord;

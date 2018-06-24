@@ -51,26 +51,26 @@ public class SceneRecorder : MonoBehaviour {
 	public SceneRecord RecordSceneSnapshot(string imageFileName="../image")
     {
         // It would be faster to cache these some way, but I don't think it'll be our bottleneck
-        CameraPNGSaver[] pngSavers = FindObjectsOfType<CameraPNGSaver>(); // There may be multiple due to stereo etc
-        RecordObject[] recordObjects = FindObjectsOfType<RecordObject>();
+        ViewRecorder[] viewRecorders = FindObjectsOfType<ViewRecorder>(); // There may be multiple due to stereo etc
+        ObjectRecorder[] objectRecorders = FindObjectsOfType<ObjectRecorder>();
 
         // Instantiate the SceneRecord for this snapshot
         SceneRecord sceneRecord = new SceneRecord();
 
         // Save screenshots
-        string[] imageFileNames = new string[pngSavers.Length];
-        for(int i = 0; i < pngSavers.Length; i++)
+        string[] imageFileNames = new string[viewRecorders.Length];
+        for(int i = 0; i < viewRecorders.Length; i++)
         {
             imageFileNames[i] = imageFileName + "_" + i + ".png";
-            pngSavers[i].SaveCameraViewToPNG(imageFileNames[i], resolutionWidth, resolutionHeight);
+            viewRecorders[i].SaveCameraViewToPNG(imageFileNames[i], resolutionWidth, resolutionHeight);
         }
         sceneRecord.imageFiles = imageFileNames;
 
         // Generate the object records
-        ObjectRecord[] objectRecords = new ObjectRecord[recordObjects.Length];
-        for(int i = 0; i < recordObjects.Length; i++)
+        ObjectRecord[] objectRecords = new ObjectRecord[objectRecorders.Length];
+        for(int i = 0; i < objectRecorders.Length; i++)
         {
-            objectRecords[i] = recordObjects[i].GetRecord();
+            objectRecords[i] = objectRecorders[i].GetRecord();
         }
         sceneRecord.objectRecords = objectRecords;
 
