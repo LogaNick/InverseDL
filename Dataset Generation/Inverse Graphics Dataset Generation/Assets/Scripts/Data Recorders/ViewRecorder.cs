@@ -18,13 +18,16 @@ public class ViewRecorder : MonoBehaviour {
         SaveCameraViewToPNG("../test.png", 256, 256);
     }
 
-	public bool SaveCameraViewToPNG(string filename, int width, int height, int bits=24)
+	public bool SaveCameraViewToPNG(string fileName, int width, int height, int bits=24)
     {
         // Cache the attached camera if we haven't already done so
         if(!cam)
         {
             cam = GetComponent<Camera>();
         }
+
+        // Make sure path to fileName is good
+        FileExtensions.CheckAndCreateDirectories(fileName);
 
         // Set up the render textures
         RenderTexture tempCameraRenderTexture = new RenderTexture(width, height, bits);
@@ -44,7 +47,7 @@ public class ViewRecorder : MonoBehaviour {
 
         // Save the file
         byte[] bytes = copiedTexture.EncodeToPNG();
-        System.IO.File.WriteAllBytes(filename, bytes);
+        System.IO.File.WriteAllBytes(fileName, bytes);
         
 
         return true;

@@ -13,8 +13,8 @@ using UnityEngine;
 public class SceneRecorder : MonoBehaviour {
 
     // Resolution of our images to save
-    public int resolutionWidth = 256;
-    public int resolutionHeight = 256;
+    public int resolutionWidth = 32;
+    public int resolutionHeight = 32;
 
     /// <summary>
     /// Test function to save out the current scene snapshot
@@ -22,7 +22,7 @@ public class SceneRecorder : MonoBehaviour {
     [ContextMenu("Save Current Scene Record Snapshot")]
     public void SaveCurrentSnapshot()
     {
-        SaveCurrentSceneRecord("../scene_record.json", "../view");
+        SaveCurrentSceneRecord("../scene_record", "../view");
     }
 
     /// <summary>
@@ -33,10 +33,7 @@ public class SceneRecorder : MonoBehaviour {
     public void SaveCurrentSceneRecord(string fileName, string imageFileName)
     {
         string sceneRecordString = JsonUtility.ToJson(RecordSceneSnapshot(imageFileName));
-        using (StreamWriter writer = new StreamWriter(fileName))
-        {
-            writer.Write(sceneRecordString);
-        }
+        FileExtensions.SaveStringToFile(fileName + ".json", sceneRecordString);
     }
 
     /// <summary>
