@@ -59,7 +59,6 @@ public class ExperimentRunner : Experiment {
             // is nested and the parent is simply setting up the children experiments).
             if (recordScene)
             {
-                Debug.Log("Saving " + currentFileName);
                 sceneRecorder.SaveCurrentSceneRecord(currentFileName, currentImageFileName);
             }
 

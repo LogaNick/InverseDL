@@ -32,7 +32,9 @@ public class SceneRecorder : MonoBehaviour {
     /// <param name="imageFileName">The prefix to the pngs to output.</param>
     public void SaveCurrentSceneRecord(string fileName, string imageFileName)
     {
-        string sceneRecordString = JsonUtility.ToJson(RecordSceneSnapshot(imageFileName));
+        // Images are saved in the same directory as fileName. Remove the parts of the 
+        // path that are the same
+        string sceneRecordString = JsonUtility.ToJson(RecordSceneSnapshot(fileName, imageFileName), true);
         FileExtensions.SaveStringToFile(fileName + ".json", sceneRecordString);
     }
 
@@ -45,7 +47,7 @@ public class SceneRecorder : MonoBehaviour {
     /// </summary>
     /// <param name="imageFileName">Filename path and prefix to save images to</param>
     /// <returns>Scene record of the image paths as well as the object records in the scene</returns>
-	public SceneRecord RecordSceneSnapshot(string imageFileName="../image")
+	public SceneRecord RecordSceneSnapshot(string path, string imageFileName="../image")
     {
         // It would be faster to cache these some way, but I don't think it'll be our bottleneck
         ViewRecorder[] viewRecorders = FindObjectsOfType<ViewRecorder>(); // There may be multiple due to stereo etc
@@ -58,8 +60,12 @@ public class SceneRecorder : MonoBehaviour {
         string[] imageFileNames = new string[viewRecorders.Length];
         for(int i = 0; i < viewRecorders.Length; i++)
         {
-            imageFileNames[i] = imageFileName + "_" + i + ".png";
-            viewRecorders[i].SaveCameraViewToPNG(imageFileNames[i], resolutionWidth, resolutionHeight);
+            // Want the path removed from json file, but not for saving the actual file
+            string postfix = "_" + i + ".png";
+
+            imageFileNames[i] = FileExtensions.RemoveCommonPath(path, imageFileName) + postfix;
+            Debug.Log(imageFileNames[i]);
+            viewRecorders[i].SaveCameraViewToPNG(imageFileName + postfix, resolutionWidth, resolutionHeight);
         }
         sceneRecord.imageFiles = imageFileNames;
 

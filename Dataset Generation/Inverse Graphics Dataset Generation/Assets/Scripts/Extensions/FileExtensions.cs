@@ -47,4 +47,44 @@ public class FileExtensions : MonoBehaviour {
             }
         }
     }
+
+    /// <summary>
+    /// Removes the common path in path1 from path2
+    /// </summary>
+    /// <param name="path1"></param>
+    /// <param name="path2"></param>
+    /// <returns></returns>
+    public static string RemoveCommonPath(string path1, string path2)
+    {
+        string[] partsPath1 = path1.Split('/');
+        string[] partsPath2 = path2.Split('/');
+
+        int j = 0;
+        for (int i = 0; i < partsPath1.Length && i < partsPath2.Length; i++)
+        {
+            if (partsPath1[i] == partsPath2[i])
+            {
+                j++;
+            }
+            else
+            {
+                break;
+            }
+        }
+
+        // Reformulate the rest of the path2
+        string remainingPath = "";
+        for (; j < partsPath2.Length; j++)
+        {
+            remainingPath += partsPath2[j] + Path.DirectorySeparatorChar;
+        }
+
+        // May not actually want that extra / at the end
+        if (!path2.EndsWith("/"))
+        {
+            remainingPath = remainingPath.Remove(remainingPath.Length - 1);
+        }
+
+        return remainingPath;
+    }
 }
