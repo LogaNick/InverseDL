@@ -64,7 +64,6 @@ public class SceneRecorder : MonoBehaviour {
             string postfix = "_" + i + ".png";
 
             imageFileNames[i] = FileExtensions.RemoveCommonPath(path, imageFileName) + postfix;
-            Debug.Log(imageFileNames[i]);
             viewRecorders[i].SaveCameraViewToPNG(imageFileName + postfix, resolutionWidth, resolutionHeight);
         }
         sceneRecord.imageFiles = imageFileNames;
