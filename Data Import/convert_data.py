@@ -2,8 +2,10 @@
 """
 Converts json files to usable data for our models
 """
-
 import tensorflow as tf
+import sys
+sys.path.append('..')
+import Models.MatrixCapsulesEMTensorflow
 
 
 def decode_image(directory, image_filename):
