@@ -2,7 +2,7 @@
 
 while read url ; do
     echo "fetching $url"
-    wget "$url"
+    curl "$url"
 done < url.txt
 
 mkdir smallNORB
