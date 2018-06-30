@@ -5,11 +5,16 @@ Converts json files to usable data for our models
 import tensorflow as tf
 import sys
 sys.path.append('..')
-import Models.MatrixCapsulesEMTensorflow
+
+# Maybe look into using queues?
 
 
-def decode_image(directory, image_filename):
+def decode_image(image_filename):
     """
     Creates the tensorflow representation of the image
+    
+    See this: https://stackoverflow.com/questions/34340489/tensorflow-read-images-with-labels
+    ^ Includes using queues
     """
-    return tf.image.decode_image("{}/{}".format(directory, image_filename))
+    file_contents = tf.read_file(image_filename)
+    return tf.image.decode_image(file_contents)

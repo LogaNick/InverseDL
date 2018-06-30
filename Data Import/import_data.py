@@ -31,12 +31,18 @@ def from_json_file(path):
     return data
     
 
-def from_directory(directory):
+def from_directory(directory, add_directory_to_image_path=True):
     """
     Returns a list of all experiment data in the given directory
     """
     data = []
     for file in get_json_files_in_directory(directory):
         data.append(from_json_string(file.read_text()))
+        
+        if add_directory_to_image_path:
+            # Add the filepath
+            for i in range(len(data[-1]['imageFiles'])):
+                data[-1]['imageFiles'][i] = "{}{}".format(directory, data[-1]['imageFiles'][i])
+            
         
     return data
