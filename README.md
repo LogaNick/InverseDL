@@ -37,6 +37,7 @@ This iterative roadmap provides both the opportunity to study something interest
 
 
 |Description|Time|Group Member|Date|
+|-----------|----|------------|----|
 |Reading papers and learning background topics in graphics (see list in resources)|6h|Nick|Week of June 25|
 
 Finding github repos which implemented Dynamic Routing Between Capsules and Matrix Capsules with EM Routing (see links below), forking Matrix Capsules with EM Routing, modifying scripts for mac OS and running it locally.
