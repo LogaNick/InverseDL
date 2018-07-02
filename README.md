@@ -33,3 +33,55 @@ This iterative roadmap provides both the opportunity to study something interest
 4. Revise the code and do various tests. Conclusions. *(July 16 - July 30, ~ 15 days)*
 
 
+## Time Log
+
+
+|Description|Time|Group Member|Date|
+|Reading papers and learning background topics in graphics (see list in resources)|6h|Nick|Week of June 25|
+
+Finding github repos which implemented Dynamic Routing Between Capsules and Matrix Capsules with EM Routing (see links below), forking Matrix Capsules with EM Routing, modifying scripts for mac OS and running it locally.
+1h
+Nick
+Week of June 25
+Weekly Meeting
+2h
+ALL
+Week of June 25
+Modifying input/output/loss function of Matrix Capsules with EM Routing MNIST implementation to work with synthetic data that Jeff is generating in Unity and to predict pose matrix.
+In progress
+Nick
+Week of July 2
+Creating a demo slide which explicitly explain what kind of goals we want to achieve and several approaches that how we can do it.
+4h 
+Xu
+Week of June 25
+Reading “Matrix capsules with EM routing” and “Dynamic Routing Between Capsules”
+3h
+Xu
+June 30th
+Finding a “Capsule Network” repo based on “MNIST” dataset on github and run it. 
+1h (>3 training)
+Xu
+June 26th
+Reading "Matrix capsules with EM routing" and "Dynamic Routing Between Capsules" and "Transforming Auto-encoders"        
+4h
+Jeff
+June 23rd
+Reading PoseCNN       
+1.5h
+Jeff
+June 25th
+Setting up base pipeline to export data from Unity, including generating test translation data
+5h
+Jeff
+June 25th
+Loading data into Python
+2h
+Jeff
+June 27th
+Pipeline - Formatting data in Python for TF 
+2h (in progress)
+Jeff
+July 2nd
+
+
