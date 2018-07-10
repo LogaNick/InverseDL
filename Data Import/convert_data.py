@@ -18,12 +18,23 @@ def decode_image(image_filename):
     file_contents = tf.read_file(image_filename)
     return tf.image.decode_image(file_contents)
 
+
+
 def decode_object_record(record_name, record_data):
     """
     Creates the tensorflow representation of the given record_name
     
     record_name is a string representing the name of the record (in the json file)
     record_data is the dictionary that was retrieved from the json file
+    
+    See https://www.tensorflow.org/programmers_guide/datasets "Reading input data"
+    for issues with this for large datasets
+    """
+    return tf.convert_to_tensor(get_convertable_object_record(record_name, record_data))
+    
+def get_convertable_object_record(record_name, record_data):
+    """
+    Takes record_data[record_name] and makes it convertable to a tensor
     """
     if record_name is "name":
         # This is a string (and not a dictionary)
@@ -48,7 +59,8 @@ def decode_object_record(record_name, record_data):
                          record_data['e20'], record_data['e21'], record_data['e22'], record_data['e23'],
                          record_data['e30'], record_data['e31'], record_data['e32'], record_data['e33']))
         
-        
+    print("Could not return {} from {}".format(record_name, record_data))
+    
 def convert_to_tf_variable(vector, name=None, dtype=tf.float32):
     tf.variable(dtype=dtype, )
 
@@ -66,11 +78,31 @@ def convert_data_to_tensors(data, image_indices=[0], object_records=[]):
         for image_index in image_indices:
             converted_datum.append(decode_image(image_filename=datum['imageFiles'][image_index]))
         
-        # Add in all the object records with the given name (may want to only specify certain indices in the future)
+        # Add in all the object records with the given name 
+        # TODO: (may want to only specify certain indices in the future)
         for object_record in datum['objectRecords']:
             for object_record_key in object_records:
-                converted_datum.append(decode_object_record(object_record, object_record[object_record_key]))
+                # Get the record as a tensorflow readable value, then convert
+                # it to a tensor
+                converted_datum.append(decode_object_record(object_record_key, object_record[object_record_key]))
                 
         converted_data.append(converted_datum)
         
     return converted_data
+
+def write_tfrecord(examples, labels, output_filename="train.tfrecords"):
+    """
+    Writes a tensorflow record to outpu_filename using the examples and labels
+    
+    See https://github.com/tensorflow/tensorflow/blob/master/tensorflow/examples/how_tos/reading_data/convert_to_records.py
+    and http://machinelearninguru.com/deep_learning/tensorflow/basics/tfrecord/tfrecord.html
+    and https://medium.com/mostly-ai/tensorflow-records-what-they-are-and-how-to-use-them-c46bc4bbb564
+    """
+    with tf.python_io.TFRecordWriter(output_filename) as writer:
+        for example, label in zip(examples, labels):
+            # Create a feature dictionary
+            feature = {"example" : example, "label" : label}
+            
+            tf_example = tf.train.Example(features=tf.train.Features(feature=feature))
+            
+            writer.write(tf_example.SerializeToString())
