@@ -8,7 +8,10 @@ Created on Tue Jul 10 11:21:16 2018
 from import_data import from_directory
 from convert_data import convert_data_to_tensors
 
-data = from_directory("data/experiment_0/")
-
-examples = convert_data_to_tensors(data)
-labels = convert_data_to_tensors(data, [], ["translation"])
+def get_examples_labels_from_directory(directory="data/experiment_0/"):
+    data = from_directory(directory)
+    
+    examples = convert_data_to_tensors(data)
+    labels = convert_data_to_tensors(data, [], ["translation"])
+    
+    return examples, labels
