@@ -20,7 +20,12 @@ def decode_image(image_filename):
 
 
 
-def decode_object_record(record_name, record_data):
+def decode_object_record(record_name, 
+                         record_data, 
+                         quantize=True,
+                         record_bounds=None,
+                         record_bound_divisions=4,
+                         one_hot=True):
     """
     Creates the tensorflow representation of the given record_name
     
@@ -30,8 +35,98 @@ def decode_object_record(record_name, record_data):
     See https://www.tensorflow.org/programmers_guide/datasets "Reading input data"
     for issues with this for large datasets
     """
-    return tf.convert_to_tensor(get_convertable_object_record(record_name, record_data))
+    converted_object_record = get_convertable_object_record(record_name, record_data)
     
+    if quantize:
+        if record_bounds is None:
+            record_bounds = get_record_bounds(record_name, record_bound_divisions)
+        converted_object_record = quantize_data(converted_object_record, record_bounds)
+        
+        if one_hot:
+            converted_object_record = make_one_hot(converted_object_record, record_bound_divisions)
+        else:
+            # Make the scalar a list for tensorflow
+            converted_object_record = [converted_object_record]
+        
+    return tf.convert_to_tensor(converted_object_record)
+
+def make_one_hot(data, classes):
+    """
+    Takes the given data (which should be an int between 0 and classes - 1),
+    and makes it a one-hot vector
+    """
+    one_hot = [*[0] * classes]
+    if data < classes and data >= 0:
+        one_hot[data] = 1
+        
+    return one_hot
+
+def quantize_data(data, record_bounds):
+    """
+    Divides the data. Goes through each point in record_bounds. If each dimension
+    of data is smaller than the first point, it's in class 0, if not checks the
+    next point (if it's smaller in each dimension than that, then class 1), and
+    so on. Will default to class -1 if it's outside the bounds specified
+    """
+    data_class = -1
+    for i in range(len(record_bounds)):
+        boundary_point = record_bounds[i]
+        out_of_bounds = False
+        for j in range(len(boundary_point)):
+            if data[j] > boundary_point[j]:
+                out_of_bounds = True
+                break
+        
+        if out_of_bounds:
+            continue
+        
+        return i
+    
+    return data_class
+
+def get_record_bounds(record_name, divisions=4):
+    """
+    Returns the bounds that will be used to separate the record_name into
+    quantized parts
+    """
+    if record_name is "translation":
+        min_bounds = [-5, -5]
+        max_bounds = [5, 5]
+    else:
+        pass
+    
+    bounds_length = len(min_bounds)
+    
+    num_increments_per_dimension = divisions / bounds_length
+    increment_value = (np.array(max_bounds) - np.array(min_bounds)) / num_increments_per_dimension
+    
+    # This is the furthest point "left" in each dimension. Anything that is less than this in each dimension is in class 0
+    start_bounds = min_bounds + increment_value
+    
+    bounds = []
+    
+    # I think of this like a bit array, except the number of digits per bit
+    # is determined by num_increments_per_dimension. So 2 increments per dimension
+    # is binary, 3 is trinary, etc...
+    current_increment_index = [*[0] * len(min_bounds)]
+    
+    for i in range(divisions):
+        bound = start_bounds.copy()
+        for j in range(len(current_increment_index)):
+            bound[j] = bound[j] + current_increment_index[j] * increment_value[j]
+        
+        bounds.append(bound)
+        
+        # Increment the current_increment_index, do rollovers
+        for k in range(len(current_increment_index)):
+            current_increment_index[k] = current_increment_index[k] + 1
+            if current_increment_index[k] >= num_increments_per_dimension:
+                current_increment_index[k] = 0
+            else:
+                break
+        
+    return bounds
+
 def get_convertable_object_record(record_name, record_data):
     """
     Takes record_data[record_name] and makes it convertable to a tensor
@@ -60,11 +155,9 @@ def get_convertable_object_record(record_name, record_data):
                          record_data['e30'], record_data['e31'], record_data['e32'], record_data['e33']))
         
     print("Could not return {} from {}".format(record_name, record_data))
-    
-def convert_to_tf_variable(vector, name=None, dtype=tf.float32):
-    tf.variable(dtype=dtype, )
 
-def convert_data_to_tensors(data, image_indices=[0], object_records=[]):
+def convert_data_to_tensors(data, image_indices=[0], object_records=[],
+                            quantize=True, one_hot=True):
     """
     Converts a list of data (as imported by import_data) to a list of
     tensor lists (for each field in fields)
@@ -84,7 +177,9 @@ def convert_data_to_tensors(data, image_indices=[0], object_records=[]):
             for object_record_key in object_records:
                 # Get the record as a tensorflow readable value, then convert
                 # it to a tensor
-                converted_datum.append(decode_object_record(object_record_key, object_record[object_record_key]))
+                converted_datum.append(decode_object_record(object_record_key, object_record[object_record_key],
+                                                            quantize=quantize, 
+                                                            one_hot=one_hot))
                 
         converted_data.append(converted_datum)
         
@@ -106,3 +201,5 @@ def write_tfrecord(examples, labels, output_filename="train.tfrecords"):
             tf_example = tf.train.Example(features=tf.train.Features(feature=feature))
             
             writer.write(tf_example.SerializeToString())
+            
+get_record_bounds("translation", 4)
