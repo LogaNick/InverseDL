@@ -49,6 +49,7 @@ This iterative roadmap provides both the opportunity to study something interest
 |Reading PoseCNN|1.5h|Jeff|June 25th|
 |Setting up base pipeline to export data from Unity, including generating test translation data|5h|Jeff|June 25th|
 |Loading data into Python|2h|Jeff|June 27th|
-|Pipeline - Formatting data in Python for TF |2h (in progress)|Jeff|July 2nd|
+|Pipeline - Formatting data in Python for TF |2h|Jeff|July 2nd|
+|Pipeline - One-hot and quantization of translation labels |2.25h |Jeff|July 16th|
 
 
