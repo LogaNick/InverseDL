@@ -157,7 +157,7 @@ def get_convertable_object_record(record_name, record_data):
     print("Could not return {} from {}".format(record_name, record_data))
 
 def convert_data_to_tensors(data, image_indices=[0], object_records=[],
-                            quantize=True, one_hot=True):
+                            quantize=True, one_hot=True, image_size=[32, 32, 3]):
     """
     Converts a list of data (as imported by import_data) to a list of
     tensor lists (for each field in fields)
@@ -169,7 +169,12 @@ def convert_data_to_tensors(data, image_indices=[0], object_records=[],
         converted_datum = []
     
         for image_index in image_indices:
-            converted_datum.append(decode_image(image_filename=datum['imageFiles'][image_index]))
+            # Decode image
+            image = decode_image(image_filename=datum['imageFiles'][image_index])
+            # Reshape image so we have its size defined
+            image.set_shape(image_size)#tf.image.resize_image_with_crop_or_pad(image, image_size[0], image_size[1])
+            
+            converted_datum.append(image)
         
         # Add in all the object records with the given name 
         # TODO: (may want to only specify certain indices in the future)
