@@ -6,7 +6,7 @@ E-mail: zhangsuofei at njupt.edu.cn | hangyu5 at illinois.edu
 
 import tensorflow as tf
 import tensorflow.contrib.slim as slim
-from config import cfg
+from Models.MatrixCapsulesEMTensorflow.config import cfg
 import numpy as np
 
 def cross_ent_loss(output, x, y):
@@ -163,6 +163,7 @@ def build_arch_baseline(input, is_train: bool, num_classes: int):
 
 def build_arch(input, coord_add, is_train: bool, num_classes: int):
     test1 = []
+    print(input.get_shape())
     data_size = int(input.get_shape()[1])
     # xavier initialization is necessary here to provide higher stability
     # initializer = tf.truncated_normal_initializer(mean=0.0, stddev=0.01)
@@ -178,9 +179,11 @@ def build_arch(input, coord_add, is_train: bool, num_classes: int):
     with slim.arg_scope([slim.conv2d], trainable=is_train, biases_initializer=bias_initializer, weights_regularizer=weights_regularizer):
         with tf.variable_scope('relu_conv1') as scope:
             output = slim.conv2d(input, num_outputs=cfg.A, kernel_size=[
-                                 5, 5], stride=2, padding='VALID', scope=scope, activation_fn=tf.nn.relu)
-            data_size = int(np.floor((data_size - 4) / 2))
+                                 5, 5, 3], stride=2, padding='VALID', scope=scope, activation_fn=tf.nn.relu)
+            data_size = int(np.floor((data_size - 5) / 2))
 
+            print(str(output.get_shape()))
+            print(str([cfg.batch_size, data_size, data_size, cfg.A]))
             assert output.get_shape() == [cfg.batch_size, data_size, data_size, cfg.A]
             tf.logging.info('conv1 output shape: {}'.format(output.get_shape()))
 

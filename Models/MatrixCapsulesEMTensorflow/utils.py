@@ -3,10 +3,12 @@ import scipy
 import numpy as np
 import tensorflow as tf
 
-from config import cfg
-import data.smallNORB as norb
+from Models.MatrixCapsulesEMTensorflow.config import cfg
+import Models.MatrixCapsulesEMTensorflow.data.smallNORB as norb
 from keras.datasets import cifar10, cifar100
 from keras import backend as K
+
+from data_import.quick_data_load import get_examples_labels_from_directory
 
 import logging
 import daiquiri
@@ -18,6 +20,7 @@ logger = daiquiri.getLogger(__name__)
 def create_inputs_norb(is_train: bool, epochs: int):
 
     import re
+    """
     if is_train:
         CHUNK_RE = re.compile(r"train\d+\.tfrecords")
     else:
@@ -27,9 +30,12 @@ def create_inputs_norb(is_train: bool, epochs: int):
     chunk_files = [os.path.join(processed_dir, fname)
                    for fname in os.listdir(processed_dir)
                    if CHUNK_RE.match(fname)]
+    """
 
-    image, label = norb.read_norb_tfrecord(chunk_files, epochs)
+    #image, label = norb.read_norb_tfrecord(chunk_files, epochs)
+    image, label = get_examples_labels_from_directory("data_import/data/experiment_0/")
 
+    """
     if is_train:
         # TODO: is it the right order: add noise, resize, then corp?
         image = tf.image.random_brightness(image, max_delta=32. / 255.)
@@ -40,6 +46,7 @@ def create_inputs_norb(is_train: bool, epochs: int):
     else:
         image = tf.image.resize_images(image, [48, 48])
         image = tf.slice(image, [8, 8, 0], [32, 32, 1])
+    """
 
     x, y = tf.train.shuffle_batch([image, label], num_threads=cfg.num_threads, batch_size=cfg.batch_size, capacity=cfg.batch_size * 64,
                                   min_after_dequeue=cfg.batch_size * 32, allow_smaller_final_batch=False)
