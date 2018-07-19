@@ -34,6 +34,7 @@ def create_inputs_norb(is_train: bool, epochs: int):
 
     #image, label = norb.read_norb_tfrecord(chunk_files, epochs)
     image, label = get_examples_labels_from_directory("data_import/data/experiment_0/")
+    image = tf.cast(image, tf.float32)
 
     """
     if is_train:
@@ -48,8 +49,9 @@ def create_inputs_norb(is_train: bool, epochs: int):
         image = tf.slice(image, [8, 8, 0], [32, 32, 1])
     """
 
-    x, y = tf.train.shuffle_batch([image, label], num_threads=cfg.num_threads, batch_size=1, capacity=cfg.batch_size * 64,
-                                  min_after_dequeue=cfg.batch_size * 32, allow_smaller_final_batch=False)
+    x, y = tf.train.shuffle_batch([image, label], num_threads=cfg.num_threads, batch_size=cfg.batch_size, capacity=cfg.batch_size * 64,
+                                  min_after_dequeue=cfg.batch_size * 32, allow_smaller_final_batch=False,
+                                  enqueue_many=True)
 
     return x, y
 
