@@ -179,8 +179,8 @@ def build_arch(input, coord_add, is_train: bool, num_classes: int):
     with slim.arg_scope([slim.conv2d], trainable=is_train, biases_initializer=bias_initializer, weights_regularizer=weights_regularizer):
         with tf.variable_scope('relu_conv1') as scope:
             output = slim.conv2d(input, num_outputs=cfg.A, kernel_size=[
-                                 5, 5, 3], stride=2, padding='VALID', scope=scope, activation_fn=tf.nn.relu)
-            data_size = int(np.floor((data_size - 5) / 2))
+                                 5, 5], stride=2, padding='VALID', scope=scope, activation_fn=tf.nn.relu)
+            data_size = int(np.floor((data_size - 4) / 2))
 
             print(str(output.get_shape()))
             print(str([cfg.batch_size, data_size, data_size, cfg.A]))
