@@ -49,23 +49,22 @@ def read_generated_inputs(filenames, epochs):
 def create_inputs_norb(is_train: bool, epochs: int):
 
     import re
-    """
+    
     if is_train:
         CHUNK_RE = re.compile(r"train\d+\.tfrecords")
     else:
         CHUNK_RE = re.compile(r"test\d+\.tfrecords")
 
-    processed_dir = './data'
+    processed_dir = 'Models/MatrixCapsulesEMTensorflow/data'
     chunk_files = [os.path.join(processed_dir, fname)
                    for fname in os.listdir(processed_dir)
                    if CHUNK_RE.match(fname)]
-    """
 
-    #image, label = norb.read_norb_tfrecord(chunk_files, epochs)
-    image, label = get_examples_labels_from_directory("data_import/data/experiment_0/")
-    image = tf.cast(image, tf.float32)
-
-    """
+    image, label = norb.read_norb_tfrecord(chunk_files, epochs)
+    #image, label = get_examples_labels_from_directory("data_import/data/experiment_0/")
+    #image = tf.cast(image, tf.float32)
+    image2, label2 = read_generated_inputs(["train.tfrecords"], epochs)
+    
     if is_train:
         # TODO: is it the right order: add noise, resize, then corp?
         image = tf.image.random_brightness(image, max_delta=32. / 255.)
@@ -76,11 +75,9 @@ def create_inputs_norb(is_train: bool, epochs: int):
     else:
         image = tf.image.resize_images(image, [48, 48])
         image = tf.slice(image, [8, 8, 0], [32, 32, 1])
-    """
 
-    x, y = tf.train.shuffle_batch([image, label], num_threads=cfg.num_threads, batch_size=cfg.batch_size, capacity=cfg.batch_size * 64,
-                                  min_after_dequeue=cfg.batch_size * 32, allow_smaller_final_batch=False,
-                                  enqueue_many=True)
+    x, y = tf.train.shuffle_batch([image2, label2], num_threads=cfg.num_threads, batch_size=cfg.batch_size, capacity=cfg.batch_size * 64,
+                                  min_after_dequeue=cfg.batch_size * 32, allow_smaller_final_batch=False)
 
     return x, y
 
