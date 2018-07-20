@@ -10,6 +10,6 @@ import Models.MatrixCapsulesEMTensorflow as capsule
 import Models.MatrixCapsulesEMTensorflow.config
 import Models.MatrixCapsulesEMTensorflow.train as train
 
-examples, labels = get_examples_labels_from_directory("data_import/data/experiment_0/")
+#examples, labels = get_examples_labels_from_directory("data_import/data/experiment_0/")
 
 train.main([None, "smallNORB"])
