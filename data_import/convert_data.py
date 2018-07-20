@@ -18,14 +18,20 @@ def decode_image(image_filename):
     file_contents = tf.read_file(image_filename)
     return tf.image.decode_image(file_contents)
 
-
+def get_image_bytes(image_filename):
+    x = None
+    with open(image_filename, 'rb') as f:
+        x = f.read()
+    
+    return x
 
 def decode_object_record(record_name, 
                          record_data, 
                          quantize=True,
                          record_bounds=None,
                          record_bound_divisions=4,
-                         one_hot=True):
+                         one_hot=True,
+                         convert_to_tensor=True):
     """
     Creates the tensorflow representation of the given record_name
     
@@ -48,7 +54,10 @@ def decode_object_record(record_name,
             # Make the scalar a list for tensorflow
             converted_object_record = [converted_object_record]
         
-    return tf.convert_to_tensor(converted_object_record)
+    if convert_to_tensor:
+        converted_object_record = tf.convert_to_tensor(converted_object_record)
+    
+    return converted_object_record
 
 def make_one_hot(data, classes):
     """
@@ -156,6 +165,47 @@ def get_convertable_object_record(record_name, record_data):
         
     print("Could not return {} from {}".format(record_name, record_data))
 
+def get_raw_images(data, image_indices=[0]):
+    converted_data = []
+    
+    for datum in data:
+        converted_datum = []
+    
+        for image_index in image_indices:
+            # Decode image
+            image = get_image_bytes(datum['imageFiles'][image_index])
+            
+            converted_datum.append(image)
+        
+        converted_data.append(converted_datum)
+    
+    return converted_data
+
+def get_examples(data, object_records=["translation"], quantize=True, 
+                 one_hot=True, convert_to_tensor=False):
+    """
+    Cutting up convert_data_to_tensors, this will gather the examples without
+    any images
+    """
+    converted_data = []
+    
+    for datum in data:
+        converted_datum = []
+        # Add in all the object records with the given name 
+        # TODO: (may want to only specify certain indices in the future)
+        for object_record in datum['objectRecords']:
+            for object_record_key in object_records:
+                # Get the record as a tensorflow readable value, then convert
+                # it to a tensor
+                converted_datum.append(decode_object_record(object_record_key, object_record[object_record_key],
+                                                            quantize=quantize, 
+                                                            one_hot=one_hot,
+                                                            convert_to_tensor=convert_to_tensor))
+                
+        converted_data.append(converted_datum)
+        
+    return converted_data
+
 def convert_data_to_tensors(data, image_indices=[0], object_records=[],
                             quantize=True, one_hot=True, image_size=[32, 32, 3]):
     """
@@ -190,21 +240,27 @@ def convert_data_to_tensors(data, image_indices=[0], object_records=[],
         
     return converted_data
 
-def write_tfrecord(examples, labels, output_filename="train.tfrecords"):
+def write_tfrecord(data, output_filename="train.tfrecords", are_tensors=True):
     """
     Writes a tensorflow record to outpu_filename using the examples and labels
+    
+    are_tensors will first encode the examples/labels from tensors
     
     See https://github.com/tensorflow/tensorflow/blob/master/tensorflow/examples/how_tos/reading_data/convert_to_records.py
     and http://machinelearninguru.com/deep_learning/tensorflow/basics/tfrecord/tfrecord.html
     and https://medium.com/mostly-ai/tensorflow-records-what-they-are-and-how-to-use-them-c46bc4bbb564
     """
+    examples = get_raw_images(data)
+    labels = get_examples(data)
+    
     with tf.python_io.TFRecordWriter(output_filename) as writer:
         for example, label in zip(examples, labels):
             # Create a feature dictionary
-            feature = {"example" : example, "label" : label}
+            feature = {
+                        "example" : tf.train.Feature(bytes_list=tf.train.BytesList(value=example)),
+                        "label" :  tf.train.Feature(int64_list=tf.train.Int64List(value=label[0]))
+                       }
             
             tf_example = tf.train.Example(features=tf.train.Features(feature=feature))
             
             writer.write(tf_example.SerializeToString())
-            
-get_record_bounds("translation", 4)
