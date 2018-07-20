@@ -17,6 +17,35 @@ daiquiri.setup(level=logging.DEBUG)
 logger = daiquiri.getLogger(__name__)
 
 
+def read_generated_inputs(filenames, epochs):
+    """
+    Basically copying over smallNORB's read_norb_tfrecord but using our
+    tfrecord
+    """
+    # Create the file queue
+    filename_queue = tf.train.string_input_producer(filenames, num_epochs=epochs)
+    reader = tf.TFRecordReader()
+    _, serialized_example = reader.read(filename_queue)
+    
+    # Parse single example
+    features = tf.parse_single_example(serialized_example,
+                                       features={
+                                           'example': tf.FixedLenFeature([], tf.string),
+                                           'label': tf.FixedLenFeature([], tf.int64),
+                                       })
+    
+    # Decode
+    img = tf.decode_raw(features['example'], tf.float64)
+    
+    # Reshape, cast
+    img = tf.reshape(img, [32, 32, 3])
+    img = tf.cast(img, tf.float32)
+    
+    # Label cast
+    label = tf.cast(features['label'], tf.int32)
+    
+    return img, label
+
 def create_inputs_norb(is_train: bool, epochs: int):
 
     import re
