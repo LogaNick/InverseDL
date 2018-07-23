@@ -240,18 +240,18 @@ def convert_data_to_tensors(data, image_indices=[0], object_records=[],
         
     return converted_data
 
-def write_tfrecord(data, output_filename="train.tfrecords", are_tensors=True):
+def write_tfrecord(data, output_filename="train.tfrecords", 
+                   object_records=["translation"], quantize=True, 
+                   one_hot=True, convert_to_tensor=False):
     """
     Writes a tensorflow record to outpu_filename using the examples and labels
-    
-    are_tensors will first encode the examples/labels from tensors
     
     See https://github.com/tensorflow/tensorflow/blob/master/tensorflow/examples/how_tos/reading_data/convert_to_records.py
     and http://machinelearninguru.com/deep_learning/tensorflow/basics/tfrecord/tfrecord.html
     and https://medium.com/mostly-ai/tensorflow-records-what-they-are-and-how-to-use-them-c46bc4bbb564
     """
     examples = get_raw_images(data)
-    labels = get_examples(data)
+    labels = get_examples(data, object_records, quantize, one_hot)
     
     with tf.python_io.TFRecordWriter(output_filename) as writer:
         for example, label in zip(examples, labels):
