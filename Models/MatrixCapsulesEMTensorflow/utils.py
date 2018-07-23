@@ -31,18 +31,19 @@ def read_generated_inputs(filenames, epochs):
     features = tf.parse_single_example(serialized_example,
                                        features={
                                            'example': tf.FixedLenFeature([], tf.string),
-                                           'label': tf.FixedLenFeature([], tf.int64),
+                                           'label': tf.FixedLenFeature([4], tf.int64)
                                        })
     
     # Decode
-    img = tf.decode_raw(features['example'], tf.float64)
+    img = tf.image.decode_png(features['example'], 3)
     
     # Reshape, cast
     img = tf.reshape(img, [32, 32, 3])
     img = tf.cast(img, tf.float32)
     
     # Label cast
-    label = tf.cast(features['label'], tf.int32)
+    label = features['label']
+    label = tf.cast(label, tf.int32)
     
     return img, label
 
