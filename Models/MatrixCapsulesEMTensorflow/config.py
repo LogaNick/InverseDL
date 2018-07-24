@@ -71,7 +71,7 @@ def get_dataset_size_test(dataset_name: str):
 
 
 def get_num_classes(dataset_name: str):
-    options = {'mnist': 10, 'smallNORB': 5, 'fashion_mnist': 10, 'cifar10': 10, 'cifar100': 100}
+    options = {'mnist': 10, 'smallNORB': 4, 'fashion_mnist': 10, 'cifar10': 10, 'cifar100': 100}
     return options[dataset_name]
 
 

@@ -31,7 +31,7 @@ def read_generated_inputs(filenames, epochs):
     features = tf.parse_single_example(serialized_example,
                                        features={
                                            'example': tf.FixedLenFeature([], tf.string),
-                                           'label': tf.FixedLenFeature([4], tf.int64)
+                                           'label': tf.FixedLenFeature([], tf.int64)
                                        })
     
     # Decode
