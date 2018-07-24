@@ -51,5 +51,9 @@ This iterative roadmap provides both the opportunity to study something interest
 |Loading data into Python|2h|Jeff|June 27th|
 |Pipeline - Formatting data in Python for TF |2h|Jeff|July 2nd|
 |Pipeline - One-hot and quantization of translation labels |2.25h |Jeff|July 16th|
-
+|Pipeline - Trying to hack in tf tensors for inputs |3.25h |Jeff|July 17th-19th|
+|Pipeline/Meeting with Nick - Creating tfrecords for input |4h |Jeff|July 20th|
+|Pipeline - Data import with tfrecord |1.5h |Jeff|July 23rd|
+|Meeting (all hands) - More pipeline work, planning future |2.75h |Jeff|July 23rd|
+|Code cleanup |1.75h |Jeff|July 24th|
 
