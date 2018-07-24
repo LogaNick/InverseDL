@@ -5,6 +5,7 @@
 [Bb]uild/
 [Bb]uilds/
 Assets/AssetStoreTools*
+data_import/data/
 
 # Visual Studio cache directory
 .vs/
