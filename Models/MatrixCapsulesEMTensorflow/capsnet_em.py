@@ -69,7 +69,7 @@ def spread_loss(output, pose_out, x, y, m):
     with tf.variable_scope('decoder'):
         pose_out = slim.fully_connected(pose_out, 512, trainable=True, weights_regularizer=tf.contrib.layers.l2_regularizer(5e-04))
         pose_out = slim.fully_connected(pose_out, 1024, trainable=True, weights_regularizer=tf.contrib.layers.l2_regularizer(5e-04))
-        pose_out = slim.fully_connected(pose_out, data_size * data_size * 3,
+        pose_out = slim.fully_connected(pose_out, data_size * data_size,
                                         trainable=True, activation_fn=tf.sigmoid, weights_regularizer=tf.contrib.layers.l2_regularizer(5e-04))
 
         x = tf.reshape(x, shape=[cfg.batch_size, -1])
