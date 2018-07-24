@@ -65,14 +65,14 @@ def get_coord_add(dataset_name: str):
 def get_dataset_size_train(dataset_name: str):
     options = {'mnist': 55000, 'smallNORB': 23400 * 2,
                'fashion_mnist': 55000, 'cifar10': 50000, 'cifar100': 50000,
-               'translation' : 23400 * 2}
+               'translation' : 121}
     return options[dataset_name]
 
 
 def get_dataset_size_test(dataset_name: str):
     options = {'mnist': 10000, 'smallNORB': 23400 * 2,
                'fashion_mnist': 10000, 'cifar10': 10000, 'cifar10': 10000,
-               'translation' : 23400 * 2}
+               'translation' : 121}
     return options[dataset_name]
 
 
