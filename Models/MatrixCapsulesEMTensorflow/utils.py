@@ -68,7 +68,6 @@ def create_inputs_translation(train, epochs : int):
 def create_inputs_norb(is_train: bool, epochs: int):
 
     import re
-    
     if is_train:
         CHUNK_RE = re.compile(r"train\d+\.tfrecords")
     else:
@@ -78,11 +77,9 @@ def create_inputs_norb(is_train: bool, epochs: int):
     chunk_files = [os.path.join(processed_dir, fname)
                    for fname in os.listdir(processed_dir)
                    if CHUNK_RE.match(fname)]
-    
+
     image, label = norb.read_norb_tfrecord(chunk_files, epochs)
-    image, label = get_examples_labels_from_directory("data_import/data/experiment_0/")
-    image = tf.cast(image, tf.float32)
-    
+
     if is_train:
         # TODO: is it the right order: add noise, resize, then corp?
         image = tf.image.random_brightness(image, max_delta=32. / 255.)
