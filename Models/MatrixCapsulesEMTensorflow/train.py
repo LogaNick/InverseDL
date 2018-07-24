@@ -56,8 +56,6 @@ def main(args):
         m_op = tf.placeholder(dtype=tf.float32, shape=())
         with tf.device('/gpu:0'):
             with slim.arg_scope([slim.variable], device='/cpu:0'):
-                #batch_x = tf.cast(batch_x, tf.float32)
-                #batch_x = tf.squeeze(batch_x)
                 batch_squash = tf.divide(batch_x, 255.)
                 batch_x = slim.batch_norm(batch_x, center=False, is_training=True, trainable=True)
                 output, pose_out = net.build_arch(batch_x, coord_add, is_train=True,
