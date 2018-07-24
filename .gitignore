@@ -35,3 +35,12 @@ sysinfo.txt
 # Builds
 *.apk
 *.unitypackage
+
+# Datasets
+Models/MatrixCapsulesEMTensorflow/data/*
+
+# Training Logs (and mnist stuff)
+Models/MatrixCapsulesEMTensorflow/logdir/*
+Models/MatrixCapsulesEMTensorflow/__pycache__/*
+Models/__pycache__/__init__.cpython-36.pyc*
+data_import/*
