@@ -17,11 +17,26 @@ daiquiri.setup(level=logging.DEBUG)
 logger = daiquiri.getLogger(__name__)
 
 
-def read_generated_inputs(filenames, epochs):
+def create_inputs_translation(train, epochs : int):
     """
+    
+    
     Basically copying over smallNORB's read_norb_tfrecord but using our
     tfrecord
     """
+    
+    filenames = []
+    
+    # TODO: Train vs Test datasets
+    # This code is somewhat copied from create_inputs_norbs
+    processed_dir = 'Models/MatrixCapsulesEMTensorflow/data/generated/translation'
+    if train:
+        prefix = "train"
+    else:
+        prefix = "test"
+    
+    filenames = [os.path.join(processed_dir, fname) for fname in os.listdir(processed_dir) if fname.startswith(prefix)]
+        
     # Create the file queue
     filename_queue = tf.train.string_input_producer(filenames, num_epochs=epochs)
     reader = tf.TFRecordReader()
@@ -45,13 +60,15 @@ def read_generated_inputs(filenames, epochs):
     label = features['label']
     label = tf.cast(label, tf.int32)
     
-    return img, label
+    x, y = tf.train.shuffle_batch([img, label], num_threads=cfg.num_threads, batch_size=cfg.batch_size, capacity=cfg.batch_size * 64,
+                                  min_after_dequeue=cfg.batch_size * 32, allow_smaller_final_batch=False)
+    
+    return x, y
 
 def create_inputs_norb(is_train: bool, epochs: int):
 
     import re
     
-    """
     if is_train:
         CHUNK_RE = re.compile(r"train\d+\.tfrecords")
     else:
@@ -61,14 +78,11 @@ def create_inputs_norb(is_train: bool, epochs: int):
     chunk_files = [os.path.join(processed_dir, fname)
                    for fname in os.listdir(processed_dir)
                    if CHUNK_RE.match(fname)]
-    """
     
-    #image, label = norb.read_norb_tfrecord(chunk_files, epochs)
-    #image, label = get_examples_labels_from_directory("data_import/data/experiment_0/")
-    #image = tf.cast(image, tf.float32)
-    image2, label2 = read_generated_inputs(["train.tfrecords"], epochs)
+    image, label = norb.read_norb_tfrecord(chunk_files, epochs)
+    image, label = get_examples_labels_from_directory("data_import/data/experiment_0/")
+    image = tf.cast(image, tf.float32)
     
-    """
     if is_train:
         # TODO: is it the right order: add noise, resize, then corp?
         image = tf.image.random_brightness(image, max_delta=32. / 255.)
@@ -79,9 +93,8 @@ def create_inputs_norb(is_train: bool, epochs: int):
     else:
         image = tf.image.resize_images(image, [48, 48])
         image = tf.slice(image, [8, 8, 0], [32, 32, 1])
-        """
 
-    x, y = tf.train.shuffle_batch([image2, label2], num_threads=cfg.num_threads, batch_size=cfg.batch_size, capacity=cfg.batch_size * 64,
+    x, y = tf.train.shuffle_batch([image, label], num_threads=cfg.num_threads, batch_size=cfg.batch_size, capacity=cfg.batch_size * 64,
                                   min_after_dequeue=cfg.batch_size * 32, allow_smaller_final_batch=False)
 
     return x, y
