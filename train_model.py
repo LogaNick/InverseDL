@@ -12,4 +12,4 @@ import Models.MatrixCapsulesEMTensorflow.train as train
 
 #examples, labels = get_examples_labels_from_directory("data_import/data/experiment_0/")
 
-train.main([None, "translation"])
+train.main([None, "translation_9"])

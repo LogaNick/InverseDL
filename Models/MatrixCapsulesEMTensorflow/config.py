@@ -50,7 +50,10 @@ def get_coord_add(dataset_name: str):
                               [[8., 12.], [12., 12.], [16., 12.], [24., 12.]],
                               [[8., 16.], [12., 16.], [16., 16.], [24., 16.]],
                               [[8., 24.], [12., 24.], [16., 24.], [24., 24.]]], 32.),
-                'translation': ([[[8., 8.], [12., 8.], [16., 8.], [24., 8.]],
+                'translation': ([[[8., 8.], [12., 8.], [16., 8.]],
+                          [[8., 12.], [12., 12.], [16., 12.]],
+                          [[8., 16.], [12., 16.], [16., 16.]]], 28.),
+                'translation_9' : ([[[8., 8.], [12., 8.], [16., 8.], [24., 8.]],
                               [[8., 12.], [12., 12.], [16., 12.], [24., 12.]],
                               [[8., 16.], [12., 16.], [16., 16.], [24., 16.]],
                               [[8., 24.], [12., 24.], [16., 24.], [24., 24.]]], 32.)
@@ -65,19 +68,19 @@ def get_coord_add(dataset_name: str):
 def get_dataset_size_train(dataset_name: str):
     options = {'mnist': 55000, 'smallNORB': 23400 * 2,
                'fashion_mnist': 55000, 'cifar10': 50000, 'cifar100': 50000,
-               'translation' : 10201}
+               'translation' : 10201, 'translation_9' : 10201}
     return options[dataset_name]
 
 
 def get_dataset_size_test(dataset_name: str):
     options = {'mnist': 10000, 'smallNORB': 23400 * 2,
                'fashion_mnist': 10000, 'cifar10': 10000, 'cifar10': 10000,
-               'translation' : 121}
+               'translation' : 121, 'translation_9' : 121}
     return options[dataset_name]
 
 
 def get_num_classes(dataset_name: str):
-    options = {'mnist': 10, 'smallNORB': 5, 'fashion_mnist': 10, 'cifar10': 10, 'cifar100': 100, 'translation' : 4}
+    options = {'mnist': 10, 'smallNORB': 5, 'fashion_mnist': 10, 'cifar10': 10, 'cifar100': 100, 'translation' : 4, 'translation_9' : 9}
     return options[dataset_name]
 
 
