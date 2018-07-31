@@ -77,12 +77,11 @@ def quantize_data(data, record_bounds):
     next point (if it's smaller in each dimension than that, then class 1), and
     so on. Will default to class -1 if it's outside the bounds specified
     """
-    data_class = -1
     for i in range(len(record_bounds)):
         boundary_point = record_bounds[i]
         out_of_bounds = False
         for j in range(len(boundary_point)):
-            if data[j] > boundary_point[j]:
+            if np.around(data[j], 4) > boundary_point[j]:
                 out_of_bounds = True
                 break
         
@@ -91,7 +90,10 @@ def quantize_data(data, record_bounds):
         
         return i
     
-    return data_class
+    
+    print("Could not place {} into bounds {}".format(data, record_bounds))
+    
+    return i
 
 def get_record_bounds(record_name, divisions=4):
     """
@@ -106,7 +108,7 @@ def get_record_bounds(record_name, divisions=4):
     
     bounds_length = len(min_bounds)
     
-    num_increments_per_dimension = divisions / bounds_length
+    num_increments_per_dimension = int(pow(divisions, 1 / bounds_length))
     increment_value = (np.array(max_bounds) - np.array(min_bounds)) / num_increments_per_dimension
     
     # This is the furthest point "left" in each dimension. Anything that is less than this in each dimension is in class 0
@@ -182,7 +184,7 @@ def get_raw_images(data, image_indices=[0]):
     return converted_data
 
 def get_examples(data, object_records=["translation"], quantize=True, 
-                 one_hot=True, convert_to_tensor=False):
+                 one_hot=True, convert_to_tensor=False, record_bound_divisions=4):
     """
     Cutting up convert_data_to_tensors, this will gather the examples without
     any images
@@ -200,7 +202,8 @@ def get_examples(data, object_records=["translation"], quantize=True,
                 converted_datum.append(decode_object_record(object_record_key, object_record[object_record_key],
                                                             quantize=quantize, 
                                                             one_hot=one_hot,
-                                                            convert_to_tensor=convert_to_tensor))
+                                                            convert_to_tensor=convert_to_tensor,
+                                                            record_bound_divisions=record_bound_divisions))
                 
         converted_data.append(converted_datum)
         
@@ -242,7 +245,7 @@ def convert_data_to_tensors(data, image_indices=[0], object_records=[],
 
 def write_tfrecord(data, output_filename="train.tfrecords", 
                    object_records=["translation"], quantize=True, 
-                   one_hot=True, convert_to_tensor=False):
+                   one_hot=True, convert_to_tensor=False, record_bound_divisions=4):
     """
     Writes a tensorflow record to outpu_filename using the examples and labels
     
@@ -251,7 +254,7 @@ def write_tfrecord(data, output_filename="train.tfrecords",
     and https://medium.com/mostly-ai/tensorflow-records-what-they-are-and-how-to-use-them-c46bc4bbb564
     """
     examples = get_raw_images(data)
-    labels = get_examples(data, object_records, quantize, one_hot)
+    labels = get_examples(data, object_records, quantize, one_hot, record_bound_divisions=record_bound_divisions)
     
     with tf.python_io.TFRecordWriter(output_filename) as writer:
         for example, label in zip(examples, labels):

@@ -20,8 +20,11 @@ def get_examples_labels_from_directory(directory="data_import/data/experiment_0/
 
 def create_tfrecord(directory="data_import/data/experiment_0/",
                                        quantize=True,
-                                       one_hot=True):
+                                       one_hot=True,
+                                       record_bound_divisions=4):
     data = from_directory(directory)
+    print(len(data[0]))
     write_tfrecord(data, object_records=["translation"],
                                            quantize=quantize, 
-                                           one_hot=one_hot)
+                                           one_hot=one_hot,
+                                           record_bound_divisions=record_bound_divisions)
