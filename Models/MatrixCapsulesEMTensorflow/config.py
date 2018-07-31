@@ -93,5 +93,6 @@ def get_create_inputs(dataset_name: str, is_train: bool, epochs: int):
                'smallNORB': lambda: create_inputs_norb(is_train, epochs),
                'cifar10': lambda: create_inputs_cifar10(is_train),
                'cifa100': lambda: create_inputs_cifar100(is_train),
-               'translation' : lambda : create_inputs_translation(is_train, epochs)}
+               'translation': lambda: create_inputs_translation(is_train, epochs),
+               'translation_9': lambda: create_inputs_translation(is_train, epochs)}
     return options[dataset_name]
