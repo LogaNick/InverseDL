@@ -6,6 +6,7 @@
 [Bb]uilds/
 Assets/AssetStoreTools*
 data_import/data/
+data_generation/
 
 # Visual Studio cache directory
 .vs/

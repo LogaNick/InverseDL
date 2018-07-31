@@ -14,13 +14,43 @@ public class TranslationExperiment : Experiment {
 
     public GameObject target;
 
+    // If this is set above 0 (and below 3), will ignore lerping on a given axis
+    // 0 is x, 1 is y, 2 is z
+    public int ignoreAxis = -1;
+
 
     public override void PerformStep(float percentage, SceneRecorder sceneRecorder)
     {
         base.PerformStep(percentage, sceneRecorder);
 
-        target.transform.position = Vector3.Lerp(startPosition.transform.position,
+        Vector3 originalPos = target.transform.position;
+
+        float originalIgnoreAxisValue = 0f;
+
+        if (UseIgnoreAxis())
+        {
+            originalIgnoreAxisValue = target.transform.position[ignoreAxis];
+        }
+
+        Vector3 newPosition = Vector3.Lerp(startPosition.transform.position,
             endPosition.transform.position, percentage);
+
+        if(UseIgnoreAxis())
+        {
+            newPosition[ignoreAxis] = originalIgnoreAxisValue;
+        }
+
+        target.transform.position = newPosition;
+
+        Debug.Log("Moved " + name + " from " + originalPos + " to " + newPosition + ". Percentage: " + percentage);
     }
 
+    /// <summary>
+    /// Returns if the ignore axis is above -1 or below 3
+    /// </summary>
+    /// <returns></returns>
+    private bool UseIgnoreAxis()
+    {
+        return ignoreAxis >= 0 && ignoreAxis < 3;
+    }
 }
