@@ -80,7 +80,7 @@ def spread_loss(output, pose_out, x, y, m):
         tf.logging.info("Reconstructed image dimension:{}".format(image_out.get_shape()))
 
         # Visualize reconstructed image
-        tf.summary.image("reconstructed_image", output)
+        tf.summary.image("reconstructed_image", image_out)
 
         x = tf.reshape(x, shape=[cfg.batch_size, -1])
         reconstruction_loss = tf.reduce_mean(tf.square(pose_out - x))
