@@ -74,15 +74,19 @@ def spread_loss(output, pose_out, x, y, m):
                                         trainable=True, activation_fn=tf.sigmoid, weights_regularizer=tf.contrib.layers.l2_regularizer(5e-04))
         
         # Create image to visualize
-        image_out = tf.reshape(pose_out, shape=[-1, data_size, data_size, channels])
-        
-        # Check that output's shape is: [batch_size, height, width, channels]
-        tf.logging.info("Reconstructed image dimension:{}".format(image_out.get_shape()))
-
-        # Visualize reconstructed image
-        tf.summary.image("reconstructed_image", output)
+        image_out = tf.reshape(pose_out, shape=[-1, data_size, data_size, channels])        
 
         x = tf.reshape(x, shape=[cfg.batch_size, -1])
+        image_x = tf.reshape(x, shape=[-1, data_size, data_size, channels])
+
+        # Check that output's shape is: [batch_size, height, width, channels]
+        tf.logging.info("Reconstructed image dimension:{}".format(image_out.get_shape()))
+        tf.logging.info("Original image dimension:{}".format(image_x.get_shape()))
+
+        # Visualize original image
+        tf.summary.image("original_image", image_x)
+        tf.summary.image("reconstructed_image", image_out)
+
         reconstruction_loss = tf.reduce_mean(tf.square(pose_out - x))
 
     if cfg.weight_reg:
