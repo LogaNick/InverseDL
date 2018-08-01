@@ -27,6 +27,12 @@ def cross_ent_loss(output, x, y):
         output = slim.fully_connected(output, 1024, trainable=True)
         output = slim.fully_connected(output, data_size * data_size,
                                       trainable=True, activation_fn=tf.sigmoid)
+        
+        # Check that output's shape is: [batch_size, height, width, channels]
+        tf.logging.info("Shape of output used in reconstruction loss: {}".format(output.get_shape()))
+
+        # Visualize reconstructed image
+        tf.summary.image("ReconstructedImage",output)
 
         x = tf.reshape(x, shape=[cfg.batch_size, -1])
         reconstruction_loss = tf.reduce_mean(tf.square(output - x))
