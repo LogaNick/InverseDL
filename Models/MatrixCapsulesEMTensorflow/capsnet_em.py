@@ -72,6 +72,15 @@ def spread_loss(output, pose_out, x, y, m):
         pose_out = slim.fully_connected(pose_out, 1024, trainable=True, weights_regularizer=tf.contrib.layers.l2_regularizer(5e-04))
         pose_out = slim.fully_connected(pose_out, data_size * data_size  * channels,
                                         trainable=True, activation_fn=tf.sigmoid, weights_regularizer=tf.contrib.layers.l2_regularizer(5e-04))
+        
+        # Create image to visualize
+        image_out = tf.reshape(pose_out, shape=[-1, data_size, data_size, channels])
+        
+        # Check that output's shape is: [batch_size, height, width, channels]
+        tf.logging.info("Reconstructed image dimension:{}".format(image_out.get_shape()))
+
+        # Visualize reconstructed image
+        tf.summary.image("reconstructed_image", image_out)
 
         x = tf.reshape(x, shape=[cfg.batch_size, -1])
         reconstruction_loss = tf.reduce_mean(tf.square(pose_out - x))

@@ -44,3 +44,5 @@ Models/MatrixCapsulesEMTensorflow/data/*
 # Logs
 logdir/*
 Models/MatrixCapsulesEMTensorflow/logdir/*
+*.pyc
+test_logdir
