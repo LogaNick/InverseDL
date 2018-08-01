@@ -6,6 +6,7 @@ Created on Tue Jul 10 11:21:16 2018
 """
 from data_import.import_data import from_directory
 from data_import.convert_data import convert_data_to_tensors, write_tfrecord
+import numpy as np
 
 def get_examples_labels_from_directory(directory="data_import/data/experiment_0/",
                                        quantize=True,
@@ -30,4 +31,38 @@ def create_tfrecord(directory="data_import/data/experiment_0/",
     write_tfrecord(data, output_filename,  object_records=object_records,
                                            quantize=quantize, 
                                            one_hot=one_hot,
-                                           record_bound_divisions=record_bound_divisions)
+                                           record_bound_divisions=record_bound_divisions,
+                                           combine_labels=combine_labels)
+    
+    
+def create_train_test_records(directory="data_import/data/experiment_0",
+                              split=[0.7, 0.3],
+                              quantize=True,
+                              one_hot=True,
+                              record_bound_divisions=[4],
+                              object_records=["translation"],
+                              combine_labels=True):
+    data = from_directory(directory)
+    
+    # Create a split
+    mask = np.random.choice([True, False], len(data), p=split)
+    
+    training_data = np.array(data)[mask]
+    testing_data = np.array(data)[mask == False]
+    
+    # Save the training and testing data
+    write_tfrecord(training_data,
+                   "train.tfrecords",
+                   object_records=object_records,
+                   quantize=quantize, 
+                   one_hot=one_hot,
+                   record_bound_divisions=record_bound_divisions,
+                   combine_labels=combine_labels)
+    
+    write_tfrecord(testing_data,
+                   "test.tfrecords",
+                   object_records=object_records,
+                   quantize=quantize, 
+                   one_hot=one_hot,
+                   record_bound_divisions=record_bound_divisions,
+                   combine_labels=combine_labels)
