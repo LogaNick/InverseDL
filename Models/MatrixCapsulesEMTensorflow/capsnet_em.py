@@ -85,6 +85,7 @@ def spread_loss(output, pose_out, x, y, m):
 
         # Visualize original image
         tf.summary.image("original_image", image_x)
+        # Visualize reconstructed image
         tf.summary.image("reconstructed_image", image_out)
 
         reconstruction_loss = tf.reduce_mean(tf.square(pose_out - x))
