@@ -22,11 +22,12 @@ def create_tfrecord(directory="data_import/data/experiment_0/",
                     output_filename="train.tfrecords",
                     quantize=True,
                     one_hot=True,
-                    record_bound_divisions=4):
+                    record_bound_divisions=[4],
+                    object_records=["translation"],
+                    combine_labels=True):
     
     data = from_directory(directory)
-    print(len(data[0]))
-    write_tfrecord(data, output_filename,  object_records=["translation"],
+    write_tfrecord(data, output_filename,  object_records=object_records,
                                            quantize=quantize, 
                                            one_hot=one_hot,
                                            record_bound_divisions=record_bound_divisions)
