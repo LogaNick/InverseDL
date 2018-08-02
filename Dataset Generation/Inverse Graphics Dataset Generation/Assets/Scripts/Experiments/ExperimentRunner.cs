@@ -44,7 +44,7 @@ public class ExperimentRunner : Experiment {
         RunExperiments(experiments, sceneRecorder, baseFileName, baseFileName + "_img", steps, recordScene);
     }
 
-    public static void RunExperiments(List<Experiment> experiments, SceneRecorder sceneRecorder, string baseFileName,
+    public void RunExperiments(List<Experiment> experiments, SceneRecorder sceneRecorder, string baseFileName,
         string baseImageFileName, int steps, bool recordScene, ExperimentCallback callback = null)
     {
         int currentStep = 0;
@@ -64,6 +64,13 @@ public class ExperimentRunner : Experiment {
         float percent = currentStep / (float)steps;
         foreach (Experiment experiment in experiments)
         {
+
+            if (currentStep == steps && !experiment.doFinalStep)
+            {
+                // Quit all experiments, exclusive final step. Don't record final scene
+                return;
+            }
+
             experiment.PerformStep(percent, sceneRecorder);
         }
 

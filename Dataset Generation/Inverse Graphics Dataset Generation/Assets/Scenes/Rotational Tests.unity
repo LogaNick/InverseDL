@@ -205,6 +205,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cfd97cf8cfe6fa14ca42c8bff4677b39, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  doFinalStep: 1
   startPosition: {fileID: 1092963261}
   endPosition: {fileID: 1463994478}
   target: {fileID: 220811416}
@@ -760,6 +761,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 36530f50f77876d48a85ffe758c4e8a2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  doFinalStep: 0
   axis: {x: 0, y: 1, z: 0}
   startAngle: -180
   endAngle: 180
@@ -832,6 +834,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f57a263cc9d082c4b946fd7aabbef59b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  doFinalStep: 1
   experiments: []
   preRunExperiments: []
   steps: 10
@@ -930,6 +933,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cfd97cf8cfe6fa14ca42c8bff4677b39, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  doFinalStep: 1
   startPosition: {fileID: 984634292}
   endPosition: {fileID: 2086606195}
   target: {fileID: 220811416}
