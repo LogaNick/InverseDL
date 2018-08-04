@@ -306,9 +306,6 @@ def test_accuracy(logits, labels):
     correct_preds = tf.equal(tf.to_int32(labels), logits_idx)
     accuracy = tf.reduce_sum(tf.cast(correct_preds, tf.float32)) / cfg.batch_size
 
-    tf.summary.histogram('correct_predictions', tf.reduce_sum(correct_preds, axis=1))
-    tf.summary.histogram('batch_labels', tf.reduce_sum(labels, axis=1))
-
     return accuracy
 
 
