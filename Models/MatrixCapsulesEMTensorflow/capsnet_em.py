@@ -295,7 +295,7 @@ def build_arch(input, coord_add, is_train: bool, num_classes: int):
 
         pose = tf.nn.avg_pool(tf.reshape(miu, shape=[cfg.batch_size, data_size, data_size, -1]), ksize=[
                               1, data_size, data_size, 1], strides=[1, 1, 1, 1], padding='VALID')
-        pose_out = tf.reshape(pose, shape=[cfg.batch_size, num_classes, 18])
+        pose_out = tf.reshape(pose, shape=[cfg.batch_size, num_classes, 16])
 
     return output, pose_out
 
