@@ -64,6 +64,10 @@ def main(args):
                                                   num_classes=num_classes)
                 # loss = net.cross_ent_loss(output, batch_labels)
                 tf.logging.debug(pose_out.get_shape())
+                
+                # Display the changes in margin over time
+                tf.summary.scalar('margin', m_op)
+
                 loss, spread_loss, mse, _ = net.spread_loss(
                     output, pose_out, batch_squash, batch_labels, m_op)
                 acc = net.test_accuracy(output, batch_labels)
