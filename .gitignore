@@ -46,3 +46,6 @@ logdir/*
 Models/MatrixCapsulesEMTensorflow/logdir/*
 *.pyc
 test_logdir
+
+# VS code stuff
+.vscode/*
