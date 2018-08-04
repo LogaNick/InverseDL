@@ -10,7 +10,7 @@ flags.DEFINE_float('ac_lambda_step', 0.01,
                    'It is described that \lambda increases at each iteration with a fixed schedule, however specific super parameters is absent.')
 
 flags.DEFINE_integer('batch_size', 50, 'batch size')
-flags.DEFINE_integer('epoch', 50, 'epoch')
+flags.DEFINE_integer('epoch', 75, 'epoch')
 flags.DEFINE_integer('iter_routing', 2, 'number of iterations')
 flags.DEFINE_float('m_schedule', 0.2, 'the m will get to 0.9 at current epoch')
 flags.DEFINE_float('epsilon', 1e-9, 'epsilon')
@@ -60,7 +60,8 @@ def get_coord_add(dataset_name: str):
                 'rotation_8' : ([[[8., 8.], [12., 8.], [16., 8.], [24., 8.]],
                               [[8., 12.], [12., 12.], [16., 12.], [24., 12.]],
                               [[8., 16.], [12., 16.], [16., 16.], [24., 16.]],
-                              [[8., 24.], [12., 24.], [16., 24.], [24., 24.]]], 32.)
+                              [[8., 24.], [12., 24.], [16., 24.], [24., 24.]]], 32.),
+                'rotation_96' : ([], 96.) # Note: comment out coordinate addition
                }
     coord_add, scale = options[dataset_name]
 
@@ -72,19 +73,19 @@ def get_coord_add(dataset_name: str):
 def get_dataset_size_train(dataset_name: str):
     options = {'mnist': 55000, 'smallNORB': 23400 * 2,
                'fashion_mnist': 55000, 'cifar10': 50000, 'cifar100': 50000,
-               'translation' : 10201, 'translation_9' : 10201, 'rotation_8' : 8712}
+               'translation' : 10201, 'translation_9' : 10201, 'rotation_8' : 8712, 'rotation_96' : 33800}
     return options[dataset_name]
 
 
 def get_dataset_size_test(dataset_name: str):
     options = {'mnist': 10000, 'smallNORB': 23400 * 2,
                'fashion_mnist': 10000, 'cifar10': 10000, 'cifar10': 10000,
-               'translation' : 121, 'translation_9' : 121, 'rotation_8' : 0}
+               'translation' : 121, 'translation_9' : 121, 'rotation_8' : 0, 'rotation_96' : 0}
     return options[dataset_name]
 
 
 def get_num_classes(dataset_name: str):
-    options = {'mnist': 10, 'smallNORB': 5, 'fashion_mnist': 10, 'cifar10': 10, 'cifar100': 100, 'translation' : 4, 'translation_9' : 9, 'rotation_8' : 8}
+    options = {'mnist': 10, 'smallNORB': 5, 'fashion_mnist': 10, 'cifar10': 10, 'cifar100': 100, 'translation' : 4, 'translation_9' : 9, 'rotation_8' : 8, 'rotation_96' : 8}
     return options[dataset_name]
 
 
@@ -99,5 +100,6 @@ def get_create_inputs(dataset_name: str, is_train: bool, epochs: int):
                'cifa100': lambda: create_inputs_cifar100(is_train),
                'translation': lambda: create_inputs_translation(is_train, epochs),
                'translation_9': lambda: create_inputs_translation(is_train, epochs),
-               'rotation_8': lambda: create_inputs_translation(is_train, epochs)}
+               'rotation_8': lambda: create_inputs_translation(is_train, epochs),
+               'rotation_96': lambda: create_inputs_translation(is_train, epochs, dim=96)}
     return options[dataset_name]

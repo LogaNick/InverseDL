@@ -17,7 +17,7 @@ daiquiri.setup(level=logging.DEBUG)
 logger = daiquiri.getLogger(__name__)
 
 
-def create_inputs_translation(train, epochs : int):
+def create_inputs_translation(train, epochs : int, dim=32):
     """
     
     
@@ -53,7 +53,7 @@ def create_inputs_translation(train, epochs : int):
     img = tf.image.decode_png(features['example'], 3)
     
     # Reshape, cast
-    img = tf.reshape(img, [32, 32, 3])
+    img = tf.reshape(img, [dim, dim, 3])
     img = tf.cast(img, tf.float32)
     
     # Label cast

@@ -271,11 +271,11 @@ def build_arch(input, coord_add, is_train: bool, num_classes: int):
                                              data_size, cfg.D, num_classes, 16]
                 tf.logging.info('class cap votes original shape: {}'.format(votes.get_shape()))
 
-                coord_add = np.reshape(coord_add, newshape=[data_size * data_size, 1, 1, 2])
-                coord_add = np.tile(coord_add, [cfg.batch_size, cfg.D, num_classes, 1])
-                coord_add_op = tf.constant(coord_add, dtype=tf.float32)
+                # coord_add = np.reshape(coord_add, newshape=[data_size * data_size, 1, 1, 2])
+                # coord_add = np.tile(coord_add, [cfg.batch_size, cfg.D, num_classes, 1])
+                # coord_add_op = tf.constant(coord_add, dtype=tf.float32)
 
-                votes = tf.concat([coord_add_op, votes], axis=3)
+                # votes = tf.concat([coord_add_op, votes], axis=3)
                 tf.logging.info('class cap votes coord add shape: {}'.format(votes.get_shape()))
 
             with tf.variable_scope('routing') as scope:

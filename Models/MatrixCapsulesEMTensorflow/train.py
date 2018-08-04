@@ -27,6 +27,8 @@ def main(args):
     logger.info('Using dataset: {}'.format(dataset_name))
 
     """Set reproduciable random seed"""
+    # Note that this only acts at the graph level.
+    # This does not seed at the operation level.
     tf.set_random_seed(1234)
 
     coord_add = get_coord_add(dataset_name)
