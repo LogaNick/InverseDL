@@ -9,6 +9,7 @@ flags.DEFINE_float('ac_lambda0', 0.01, '\lambda in the activation function a_c, 
 flags.DEFINE_float('ac_lambda_step', 0.01,
                    'It is described that \lambda increases at each iteration with a fixed schedule, however specific super parameters is absent.')
 
+flags.DEFINE_integer('max_outputs', 50, 'max output image number for image summary')
 flags.DEFINE_integer('batch_size', 50, 'batch size')
 flags.DEFINE_integer('epoch', 75, 'epoch')
 flags.DEFINE_integer('iter_routing', 2, 'number of iterations')
