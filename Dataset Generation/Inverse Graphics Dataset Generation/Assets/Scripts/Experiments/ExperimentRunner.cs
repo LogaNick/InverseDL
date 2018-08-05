@@ -25,11 +25,9 @@ public class ExperimentRunner : Experiment {
     public int preRunSteps = 10;
 
     // When using the context menu, we'll save the experiment to this filename
-    [SerializeField]
-    protected string fileName = "data_generation/experiment_0/datum";
+    public string fileName = "data_generation/experiment_0/datum";
 
-    [SerializeField]
-    protected bool recordSceneDuringMyExperiments = true;
+    public bool recordSceneDuringMyExperiments = true;
 
     [ContextMenu("Run Experiments")]
     public void RunExperiments()
