@@ -33,6 +33,11 @@ This iterative roadmap provides both the opportunity to study something interest
 4. Revise the code and do various tests. Conclusions. *(July 16 - July 30, ~ 15 days)*
 
 
+## References
+
+6 x 3D Cute Toy Models, PSIONIC GAMES, Unity Asset Store Asset, https://assetstore.unity.com/packages/3d/characters/6-x-3d-cute-toy-models-105033
+Post Processing Stack, Unity Technologies, Unity Asset Store Asset, https://assetstore.unity.com/packages/essentials/post-processing-stack-83912
+
 ## Time Log
 
 
