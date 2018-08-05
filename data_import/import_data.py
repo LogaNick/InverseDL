@@ -57,7 +57,7 @@ def from_directory(directory, add_directory_to_image_path=True, recursive=False,
         directories = get_directories_in_directory(directory, exclude)
         
         for d in directories:
-            data.extend(from_directory(str(d), add_directory_to_image_path, recursive, exclude))
+            data.extend(from_directory(str(d) + "/", add_directory_to_image_path, recursive, exclude))
             
     
     files.append(get_json_files_in_directory(directory))

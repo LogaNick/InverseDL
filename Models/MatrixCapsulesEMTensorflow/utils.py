@@ -17,7 +17,7 @@ daiquiri.setup(level=logging.DEBUG)
 logger = daiquiri.getLogger(__name__)
 
 
-def create_inputs_translation(train, epochs : int, dim=32):
+def create_inputs_translation(train, epochs : int, dim=32, grayscale=False):
     """
     
     
@@ -54,6 +54,11 @@ def create_inputs_translation(train, epochs : int, dim=32):
     
     # Reshape, cast
     img = tf.reshape(img, [dim, dim, 3])
+    
+    # Convert to grayscale if neccessary
+    if grayscale:
+        img = tf.image.rgb_to_grayscale(img)
+    
     img = tf.cast(img, tf.float32)
     
     # Label cast
