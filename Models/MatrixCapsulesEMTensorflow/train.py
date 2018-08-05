@@ -27,6 +27,8 @@ def main(args):
     logger.info('Using dataset: {}'.format(dataset_name))
 
     """Set reproduciable random seed"""
+    # Note that this only acts at the graph level.
+    # This does not seed at the operation level.
     tf.set_random_seed(1234)
 
     coord_add = get_coord_add(dataset_name)
@@ -62,6 +64,10 @@ def main(args):
                                                   num_classes=num_classes)
                 # loss = net.cross_ent_loss(output, batch_labels)
                 tf.logging.debug(pose_out.get_shape())
+                
+                # Display the changes in margin over time
+                tf.summary.scalar('margin', m_op)
+
                 loss, spread_loss, mse, _ = net.spread_loss(
                     output, pose_out, batch_squash, batch_labels, m_op)
                 acc = net.test_accuracy(output, batch_labels)

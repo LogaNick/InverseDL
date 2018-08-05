@@ -74,15 +74,20 @@ def spread_loss(output, pose_out, x, y, m):
                                         trainable=True, activation_fn=tf.sigmoid, weights_regularizer=tf.contrib.layers.l2_regularizer(5e-04))
         
         # Create image to visualize
-        image_out = tf.reshape(pose_out, shape=[-1, data_size, data_size, channels])
-        
+        image_out = tf.reshape(pose_out, shape=[-1, data_size, data_size, channels])        
+
+        x = tf.reshape(x, shape=[cfg.batch_size, -1])
+        image_x = tf.reshape(x, shape=[-1, data_size, data_size, channels])
+
         # Check that output's shape is: [batch_size, height, width, channels]
         tf.logging.info("Reconstructed image dimension:{}".format(image_out.get_shape()))
+        tf.logging.info("Original image dimension:{}".format(image_x.get_shape()))
 
+        # Visualize original image
+        tf.summary.image("original_image", image_x)
         # Visualize reconstructed image
         tf.summary.image("reconstructed_image", image_out)
 
-        x = tf.reshape(x, shape=[cfg.batch_size, -1])
         reconstruction_loss = tf.reduce_mean(tf.square(pose_out - x))
 
     if cfg.weight_reg:
@@ -266,11 +271,11 @@ def build_arch(input, coord_add, is_train: bool, num_classes: int):
                                              data_size, cfg.D, num_classes, 16]
                 tf.logging.info('class cap votes original shape: {}'.format(votes.get_shape()))
 
-                coord_add = np.reshape(coord_add, newshape=[data_size * data_size, 1, 1, 2])
-                coord_add = np.tile(coord_add, [cfg.batch_size, cfg.D, num_classes, 1])
-                coord_add_op = tf.constant(coord_add, dtype=tf.float32)
+                # coord_add = np.reshape(coord_add, newshape=[data_size * data_size, 1, 1, 2])
+                # coord_add = np.tile(coord_add, [cfg.batch_size, cfg.D, num_classes, 1])
+                # coord_add_op = tf.constant(coord_add, dtype=tf.float32)
 
-                votes = tf.concat([coord_add_op, votes], axis=3)
+                # votes = tf.concat([coord_add_op, votes], axis=3)
                 tf.logging.info('class cap votes coord add shape: {}'.format(votes.get_shape()))
 
             with tf.variable_scope('routing') as scope:
@@ -290,7 +295,7 @@ def build_arch(input, coord_add, is_train: bool, num_classes: int):
 
         pose = tf.nn.avg_pool(tf.reshape(miu, shape=[cfg.batch_size, data_size, data_size, -1]), ksize=[
                               1, data_size, data_size, 1], strides=[1, 1, 1, 1], padding='VALID')
-        pose_out = tf.reshape(pose, shape=[cfg.batch_size, num_classes, 18])
+        pose_out = tf.reshape(pose, shape=[cfg.batch_size, num_classes, 16])
 
     return output, pose_out
 
