@@ -98,7 +98,7 @@ def quantize_data(data, record_bounds, order=None):
     
     print("Could not place {} into bounds {}".format(data, record_bounds))
     
-    return i
+    return 0
 
 def get_rotation_order(rotation_axis):
     order = [0, 1, 2] # rotX
@@ -120,8 +120,8 @@ def get_record_bounds(record_name, divisions=4, rotation_axis="rotY"):
     order = None
     epsilon = 0 # Sometimes we want to translate the bounds or make sure we're not within some error
     if record_name is "translation":
-        min_bounds = [-5, -5]
-        max_bounds = [5, 5]
+        min_bounds = [-0.301, -0.301]
+        max_bounds = [0.301, 0.301]
     elif record_name is "eulerAngles":
         min_bounds = [0]
         max_bounds = [360]
