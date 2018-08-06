@@ -26,9 +26,29 @@ public class SwitchGameObjectsRunExperiment : MonoBehaviour {
 
             go.SetActive(true);
 
-            experimentRunner.fileName = saveTo + "/" +go.name + "/";
+            SetExperimentsFileNameRecursively(experimentRunner,  saveTo + "/" +go.name + "/");
 
             experimentRunner.RunExperiments();
         }
+    }
+
+    /// <summary>
+    /// Sets all experiment runners in the given experiment runner contains to the given filename.
+    /// Recursive
+    /// </summary>
+    /// <param name="experimentRunner"></param>
+    /// <param name="fileName"></param>
+    public void SetExperimentsFileNameRecursively(ExperimentRunner experimentRunner, string fileName)
+    {
+        foreach(Experiment experiment in experimentRunner.experiments)
+        {  
+            ExperimentRunner containedExperimentRunner = experiment as ExperimentRunner;
+            if (containedExperimentRunner != null)
+            {
+                SetExperimentsFileNameRecursively(containedExperimentRunner, fileName);
+            }
+        }
+
+        experimentRunner.fileName = fileName;
     }
 }
