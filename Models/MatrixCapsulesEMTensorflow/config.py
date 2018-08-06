@@ -93,7 +93,7 @@ def get_num_classes(dataset_name: str):
     return options[dataset_name]
 
 
-from Models.MatrixCapsulesEMTensorflow.utils import create_inputs_mnist, create_inputs_norb, create_inputs_cifar10, create_inputs_cifar100, create_inputs_translation
+from Models.MatrixCapsulesEMTensorflow.utils import create_inputs_mnist, create_inputs_norb, create_inputs_cifar10, create_inputs_cifar100, create_inputs_generated
 
 
 def get_create_inputs(dataset_name: str, is_train: bool, epochs: int):
@@ -102,9 +102,12 @@ def get_create_inputs(dataset_name: str, is_train: bool, epochs: int):
                'smallNORB': lambda: create_inputs_norb(is_train, epochs),
                'cifar10': lambda: create_inputs_cifar10(is_train),
                'cifa100': lambda: create_inputs_cifar100(is_train),
-               'translation': lambda: create_inputs_translation(is_train, epochs),
-               'translation_9': lambda: create_inputs_translation(is_train, epochs),
-               'rotation_8': lambda: create_inputs_translation(is_train, epochs),
-               'rotation_48': lambda: create_inputs_translation(is_train, epochs, dim=48),
-               'rotation_48_animals' : lambda: create_inputs_translation(is_train, epochs, dim=48, grayscale=True)}
+               'translation': lambda: create_inputs_generated(is_train, epochs),
+               'translation_9': lambda: create_inputs_generated(is_train, epochs, processed_dir='Models/MatrixCapsulesEMTensorflow/data/generated/translation_9'),
+               'rotation_8': lambda: create_inputs_generated(is_train, epochs, processed_dir='Models/MatrixCapsulesEMTensorflow/data/generated/rotation_8'),
+               'rotation_48': lambda: create_inputs_generated(is_train, epochs, dim=48, processed_dir='Models/MatrixCapsulesEMTensorflow/data/generated/rotation_48'),
+               'rotation_48_animals' : lambda: create_inputs_generated(is_train, epochs, dim=48, grayscale=True,
+                                                                       processed_dir='Models/MatrixCapsulesEMTensorflow/data/generated/rotation_48_animals'),
+               'animals' : lambda: create_inputs_generated(is_train, epochs, dim=48, grayscale=True,
+                                                                       processed_dir='Models/MatrixCapsulesEMTensorflow/data/generated/animals')}
     return options[dataset_name]
