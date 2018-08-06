@@ -63,7 +63,8 @@ def get_coord_add(dataset_name: str):
                               [[8., 16.], [12., 16.], [16., 16.], [24., 16.]],
                               [[8., 24.], [12., 24.], [16., 24.], [24., 24.]]], 32.),
                 'rotation_48' : ([], 48.), # Note: comment out coordinate addition,
-                'rotation_48_animals' : ([], 48.) # Note: comment out coordinate addition
+                'rotation_48_animals' : ([], 48.),
+                'animals' : ([], 48)# Note: comment out coordinate addition
                }
     coord_add, scale = options[dataset_name]
 
@@ -75,21 +76,27 @@ def get_coord_add(dataset_name: str):
 def get_dataset_size_train(dataset_name: str):
     options = {'mnist': 55000, 'smallNORB': 23400 * 2,
                'fashion_mnist': 55000, 'cifar10': 50000, 'cifar100': 50000,
-               'translation' : 10201, 'translation_9' : 10201, 'rotation_8' : 8712, 'rotation_48' : 33800, 'rotation_48_animals' : 40368}
+               'translation' : 10201, 'translation_9' : 10201,
+               'rotation_8' : 8712, 'rotation_48' : 33800,
+               'rotation_48_animals' : 40368,
+               'animals' : 23542}
     return options[dataset_name]
 
 
 def get_dataset_size_test(dataset_name: str):
     options = {'mnist': 10000, 'smallNORB': 23400 * 2,
                'fashion_mnist': 10000, 'cifar10': 10000, 'cifar10': 10000,
-               'translation' : 121, 'translation_9' : 121, 'rotation_8' : 0, 'rotation_48' : 0, 'rotation_48_animals' : 0}
+               'translation' : 121, 'translation_9' : 121, 'rotation_8' : 0,
+               'rotation_48' : 0, 'rotation_48_animals' : 0,
+               'animals' : 10098}
     return options[dataset_name]
 
 
 def get_num_classes(dataset_name: str):
     options = {'mnist': 10, 'smallNORB': 5, 'fashion_mnist': 10, 'cifar10': 10,
                'cifar100': 100, 'translation' : 4, 'translation_9' : 9,
-               'rotation_8' : 8, 'rotation_48' : 8, 'rotation_48_animals' : 8}
+               'rotation_8' : 8, 'rotation_48' : 8, 'rotation_48_animals' : 8,
+               'animals' : 72}
     return options[dataset_name]
 
 
