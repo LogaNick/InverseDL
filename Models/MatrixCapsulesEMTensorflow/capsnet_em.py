@@ -325,7 +325,7 @@ def test_accuracy(logits, labels):
     incorrect_preds = tf.logical_not(correct_preds)
     distr = tf.boolean_mask(labels, incorrect_preds)
     
-    tf.summary.histogram('Incorrect Predictions Distribution', distr)
+    tf.summary.histogram('Incorrect_Predictions_Distribution', distr)
 
     accuracy = tf.reduce_sum(tf.cast(correct_preds, tf.float32)) / cfg.batch_size
 
