@@ -60,17 +60,17 @@ def main(args):
             coord = tf.train.Coordinator()
             threads = tf.train.start_queue_runners(sess=sess, coord=coord)
             
-            if not os.path.exists(cfg.test_logdir + '/caps/{}/'.format(dataset_name)):
-                os.path.exists(cfg.test_logdir + '/caps/{}/'.format(dataset_name))
+            if not os.path.exists(cfg.test_logdir):
+                os.path.exists(cfg.test_logdir)
             summary_writer = tf.summary.FileWriter(
-                cfg.test_logdir + '/caps/{}'.format(dataset_name), graph=sess.graph)
+                cfg.test_logdir, graph=sess.graph)
 
-            files = os.listdir(cfg.logdir + '/caps/{}/'.format(dataset_name))
+            files = os.listdir(cfg.logdir)
             for epoch in range(1, cfg.epoch):
                 ckpt_re = ".ckpt-%d" % (num_batches_per_epoch_train * epoch)
                 for __file in files:
                     if __file.endswith(ckpt_re + ".index"):
-                        ckpt = os.path.join(cfg.logdir + '/caps/{}/'.format(dataset_name), __file[:-6])
+                        ckpt = os.path.join(cfg.logdir, __file[:-6])
                 
                 saver.restore(sess, ckpt)
 
