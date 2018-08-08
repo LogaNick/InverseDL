@@ -64,7 +64,8 @@ def get_coord_add(dataset_name: str):
                               [[8., 24.], [12., 24.], [16., 24.], [24., 24.]]], 32.),
                 'rotation_48' : ([], 48.), # Note: comment out coordinate addition,
                 'rotation_48_animals' : ([], 48.),
-                'animals' : ([], 48)# Note: comment out coordinate addition
+                'animals' : ([], 48),# Note: comment out coordinate addition (this should be 8x8)
+                'animals_rot' : ([], 48) # Note: comment out coordinate addition (this should be 8x8)
                }
     coord_add, scale = options[dataset_name]
 
@@ -79,7 +80,8 @@ def get_dataset_size_train(dataset_name: str):
                'translation' : 10201, 'translation_9' : 10201,
                'rotation_8' : 8712, 'rotation_48' : 33800,
                'rotation_48_animals' : 40368,
-               'animals' : 23542}
+               'animals' : 23542,
+               'animals_rot' : 23608}
     return options[dataset_name]
 
 
@@ -88,7 +90,8 @@ def get_dataset_size_test(dataset_name: str):
                'fashion_mnist': 10000, 'cifar10': 10000, 'cifar10': 10000,
                'translation' : 121, 'translation_9' : 121, 'rotation_8' : 0,
                'rotation_48' : 0, 'rotation_48_animals' : 0,
-               'animals' : 10098}
+               'animals' : 10098,
+               'animals_rot' : 10032}
     return options[dataset_name]
 
 
@@ -96,7 +99,8 @@ def get_num_classes(dataset_name: str):
     options = {'mnist': 10, 'smallNORB': 5, 'fashion_mnist': 10, 'cifar10': 10,
                'cifar100': 100, 'translation' : 4, 'translation_9' : 9,
                'rotation_8' : 8, 'rotation_48' : 8, 'rotation_48_animals' : 8,
-               'animals' : 72}
+               'animals' : 72,
+               'animals_rot' : 8}
     return options[dataset_name]
 
 
@@ -116,5 +120,7 @@ def get_create_inputs(dataset_name: str, is_train: bool, epochs: int):
                'rotation_48_animals' : lambda: create_inputs_generated(is_train, epochs, dim=48, grayscale=True,
                                                                        processed_dir='Models/MatrixCapsulesEMTensorflow/data/generated/rotation_48_animals'),
                'animals' : lambda: create_inputs_generated(is_train, epochs, dim=48, grayscale=True,
-                                                                       processed_dir='Models/MatrixCapsulesEMTensorflow/data/generated/animals')}
+                                                                       processed_dir='Models/MatrixCapsulesEMTensorflow/data/generated/animals'),
+               'animals_rot' : lambda: create_inputs_generated(is_train, epochs, dim=48, grayscale=True,
+                                                                       processed_dir='Models/MatrixCapsulesEMTensorflow/data/generated/animals_rot')}
     return options[dataset_name]
