@@ -65,7 +65,9 @@ def get_coord_add(dataset_name: str):
                 'rotation_48' : ([], 48.), # Note: comment out coordinate addition,
                 'rotation_48_animals' : ([], 48.),
                 'animals' : ([], 48),# Note: comment out coordinate addition (this should be 8x8)
-                'animals_rot' : ([], 48) # Note: comment out coordinate addition (this should be 8x8)
+                'animals_rot' : ([], 48),# Note: comment out coordinate addition (this should be 8x8)
+                'animals_translation' : ([], 48),# Note: comment out coordinate addition (this should be 8x8)
+                'animals_pose' : ([], 48) # Note: comment out coordinate addition (this should be 8x8)
                }
     coord_add, scale = options[dataset_name]
 
@@ -81,7 +83,9 @@ def get_dataset_size_train(dataset_name: str):
                'rotation_8' : 8712, 'rotation_48' : 33800,
                'rotation_48_animals' : 40368,
                'animals' : 23542,
-               'animals_rot' : 23608}
+               'animals_rot' : 23608,
+               'animals_translation' : 23634,
+               'animals_pose' : 60000}
     return options[dataset_name]
 
 
@@ -91,7 +95,9 @@ def get_dataset_size_test(dataset_name: str):
                'translation' : 121, 'translation_9' : 121, 'rotation_8' : 0,
                'rotation_48' : 0, 'rotation_48_animals' : 0,
                'animals' : 10098,
-               'animals_rot' : 10032}
+               'animals_rot' : 10032,
+               'animals_translation' : 10006,
+               'animals_pose' : 0}
     return options[dataset_name]
 
 
@@ -100,11 +106,15 @@ def get_num_classes(dataset_name: str):
                'cifar100': 100, 'translation' : 4, 'translation_9' : 9,
                'rotation_8' : 8, 'rotation_48' : 8, 'rotation_48_animals' : 8,
                'animals' : 72,
-               'animals_rot' : 8}
+               'animals_rot' : 8,
+               'animals_translation' : 9,
+               'animals_pose' : 5}
     return options[dataset_name]
 
 
-from Models.MatrixCapsulesEMTensorflow.utils import create_inputs_mnist, create_inputs_norb, create_inputs_cifar10, create_inputs_cifar100, create_inputs_generated
+from Models.MatrixCapsulesEMTensorflow.utils import create_inputs_mnist,\
+ create_inputs_norb, create_inputs_cifar10, create_inputs_cifar100, create_inputs_generated,\
+ create_inputs_generated_with_pose_matrix
 
 
 def get_create_inputs(dataset_name: str, is_train: bool, epochs: int):
@@ -122,5 +132,7 @@ def get_create_inputs(dataset_name: str, is_train: bool, epochs: int):
                'animals' : lambda: create_inputs_generated(is_train, epochs, dim=48, grayscale=True,
                                                                        processed_dir='Models/MatrixCapsulesEMTensorflow/data/generated/animals'),
                'animals_rot' : lambda: create_inputs_generated(is_train, epochs, dim=48, grayscale=True,
-                                                                       processed_dir='Models/MatrixCapsulesEMTensorflow/data/generated/animals_rot')}
+                                                                       processed_dir='Models/MatrixCapsulesEMTensorflow/data/generated/animals_rot'),
+               'animals_pose' : lambda: create_inputs_generated_with_pose_matrix(is_train, epochs, dim=48, grayscale=True,
+                                                                       processed_dir='Models/MatrixCapsulesEMTensorflow/data/generated/pose')}
     return options[dataset_name]
