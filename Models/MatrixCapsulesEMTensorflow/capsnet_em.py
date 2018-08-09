@@ -38,8 +38,7 @@ def cross_ent_loss(output, x, y):
 
     return loss_all, reconstruction_loss, output
 
-
-def spread_loss(output, pose_out, x, y, m):
+def spread_loss(output, pose_out, x, y, label_pose, m):
     """
     # check NaN
     # See: https://stackoverflow.com/questions/40701712/how-to-check-nan-in-gradients-in-tensorflow-when-updating
@@ -61,44 +60,25 @@ def spread_loss(output, pose_out, x, y, m):
     loss = tf.square(tf.maximum(0., m - (at - output1)))
     loss = tf.matmul(loss, 1. - y)
     loss = tf.reduce_mean(loss)
+    
+    # pose prediction loss
+    # Max pose is a 16 dimensional pose matrix for the most activated object class (for each example in the batch)
+    max_pose = tf.reduce_max(pose_out, axis=1)
+    assert max_pose.get_shape() == [cfg.batch_size, 16]
 
-    # reconstruction loss
-    # pose_out = tf.reshape(tf.matmul(pose_out, y, transpose_a=True), shape=[cfg.batch_size, -1])
-    pose_out = tf.reshape(tf.multiply(pose_out, y), shape=[cfg.batch_size, -1])
-    tf.logging.info("decoder input value dimension:{}".format(pose_out.get_shape()))
-
-    with tf.variable_scope('decoder'):
-        pose_out = slim.fully_connected(pose_out, 512, trainable=True, weights_regularizer=tf.contrib.layers.l2_regularizer(5e-04))
-        pose_out = slim.fully_connected(pose_out, 1024, trainable=True, weights_regularizer=tf.contrib.layers.l2_regularizer(5e-04))
-        pose_out = slim.fully_connected(pose_out, data_size * data_size  * channels,
-                                        trainable=True, activation_fn=tf.sigmoid, weights_regularizer=tf.contrib.layers.l2_regularizer(5e-04))
-        
-        # Create image to visualize
-        image_out = tf.reshape(pose_out, shape=[-1, data_size, data_size, channels])        
-
-        x = tf.reshape(x, shape=[cfg.batch_size, -1])
-        image_x = tf.reshape(x, shape=[-1, data_size, data_size, channels])
-
-        # Check that output's shape is: [batch_size, height, width, channels]
-        tf.logging.info("Reconstructed image dimension:{}".format(image_out.get_shape()))
-        tf.logging.info("Original image dimension:{}".format(image_x.get_shape()))
-
-        # Visualize original image
-        tf.summary.image("original_image", image_x)
-        # Visualize reconstructed image
-        tf.summary.image("reconstructed_image", image_out)
-
-        reconstruction_loss = tf.reduce_mean(tf.square(pose_out - x))
+    pose_pred_loss = tf.losses.mean_squared_error(label_pose, max_pose) 
+    tf.summary.scalar("pose_loss", pose_pred_loss)
 
     if cfg.weight_reg:
         # regularization loss
         regularization = tf.get_collection(tf.GraphKeys.REGULARIZATION_LOSSES)
         # loss+0.0005*reconstruction_loss+regularization#
-        loss_all = tf.add_n([loss] + [0.0005 * data_size* data_size * reconstruction_loss] + regularization)
+        loss_all = tf.add_n([loss] + regularization)
     else:
-        loss_all = tf.add_n([loss] + [0.0005 * data_size* data_size * reconstruction_loss])
+        # TODO: check the dims on this and scale pose prediction term.
+        loss_all = tf.add_n([loss] + [pose_pred_loss])
 
-    return loss_all, loss, reconstruction_loss, pose_out
+    return loss_all, loss, pose_pred_loss, pose_out
 
 # input should be a tensor with size as [batch_size, height, width, channels]
 
@@ -177,7 +157,7 @@ def build_arch_baseline(input, is_train: bool, num_classes: int):
 
 
 def build_arch(input, coord_add, is_train: bool, num_classes: int):
-    test1 = []
+    test1 = [] # TODO: remove this. It doesn't seem to be used.
     data_size = int(input.get_shape()[1])
     # xavier initialization is necessary here to provide higher stability
     # initializer = tf.truncated_normal_initializer(mean=0.0, stddev=0.01)
@@ -270,6 +250,8 @@ def build_arch(input, coord_add, is_train: bool, num_classes: int):
                 assert votes.get_shape() == [cfg.batch_size * data_size *
                                              data_size, cfg.D, num_classes, 16]
                 tf.logging.info('class cap votes original shape: {}'.format(votes.get_shape()))
+
+                # TODO: Reintroduce (correct implementation of) coordinate addition. 
 
                 # coord_add = np.reshape(coord_add, newshape=[data_size * data_size, 1, 1, 2])
                 # coord_add = np.tile(coord_add, [cfg.batch_size, cfg.D, num_classes, 1])

@@ -52,6 +52,10 @@ def main(args):
 
         """Get batch from data queue."""
         batch_x, batch_labels = create_inputs()
+
+        # TODO: GET pose_label FROM batch_labels. Should be shape [batch size, 16]
+        pose_label = pass
+
         # batch_y = tf.one_hot(batch_labels, depth=10, axis=1, dtype=tf.float32)
 
         """Define the dataflow graph."""
@@ -68,11 +72,11 @@ def main(args):
                 # Display the changes in margin over time
                 tf.summary.scalar('margin', m_op)
 
-                loss, spread_loss, mse, _ = net.spread_loss(
-                    output, pose_out, batch_squash, batch_labels, m_op)
+                loss, spread_loss, pose_loss, _ = net.spread_loss(
+                    output, pose_out, batch_squash, batch_labels, pose_label, m_op)
                 acc = net.test_accuracy(output, batch_labels)
                 tf.summary.scalar('spread_loss', spread_loss)
-                tf.summary.scalar('reconstruction_loss', mse)
+                tf.summary.scalar('pose_loss', pose_loss)
                 tf.summary.scalar('all_loss', loss)
                 tf.summary.scalar('train_acc', acc)
 
