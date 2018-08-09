@@ -66,7 +66,7 @@ def spread_loss(output, pose_out, x, y, label_pose, m):
     max_pose = tf.reduce_max(pose_out, axis=1)
     assert max_pose.get_shape() == [cfg.batch_size, 16]
 
-    pose_pred_loss = tf.losses.mean_squared_error(label_pose, max_pose)
+    pose_pred_loss = 0.08 * tf.losses.mean_squared_error(label_pose, max_pose)
 
     if cfg.weight_reg:
         # regularization loss
