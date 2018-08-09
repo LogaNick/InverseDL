@@ -27,14 +27,16 @@ def create_tfrecord(directory="data_import/data/experiment_0/",
                     object_records=["translation"],
                     combine_labels=True,
                     recursive=False,
-                    excluded_directories=[]):
+                    excluded_directories=[],
+                    use_pose=False):
     
     data = from_directory(directory, True, recursive, excluded_directories)
     write_tfrecord(data, output_filename,  object_records=object_records,
                                            quantize=quantize, 
                                            one_hot=one_hot,
                                            record_bound_divisions=record_bound_divisions,
-                                           combine_labels=combine_labels)
+                                           combine_labels=combine_labels,
+                                           use_pose=use_pose)
     
     
 def create_train_test_records(directory="data_import/data/experiment_0",
@@ -45,7 +47,8 @@ def create_train_test_records(directory="data_import/data/experiment_0",
                               object_records=["translation"],
                               combine_labels=True,
                               recursive=False,
-                              excluded_directories=[]):
+                              excluded_directories=[],
+                              use_pose=False):
     
     data = from_directory(directory, True, recursive, excluded_directories)
     
@@ -62,7 +65,8 @@ def create_train_test_records(directory="data_import/data/experiment_0",
                    quantize=quantize, 
                    one_hot=one_hot,
                    record_bound_divisions=record_bound_divisions,
-                   combine_labels=combine_labels)
+                   combine_labels=combine_labels,
+                   use_pose=use_pose)
     
     write_tfrecord(testing_data,
                    "test.tfrecords",
@@ -70,4 +74,5 @@ def create_train_test_records(directory="data_import/data/experiment_0",
                    quantize=quantize, 
                    one_hot=one_hot,
                    record_bound_divisions=record_bound_divisions,
-                   combine_labels=combine_labels)
+                   combine_labels=combine_labels,
+                   use_pose=use_pose)

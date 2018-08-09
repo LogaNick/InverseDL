@@ -165,7 +165,7 @@ def get_record_bounds(record_name, divisions=4, rotation_axis="rotY"):
         
     return bounds, order
 
-def get_convertable_object_record(record_name, record_data):
+def get_convertable_object_record(record_name, record_data, matrix_as_flat_vector=True):
     """
     Takes record_data[record_name] and makes it convertable to a tensor
     """
@@ -181,16 +181,23 @@ def get_convertable_object_record(record_name, record_data):
         return [record_data['x'], record_data['y'], record_data['z'], record_data['w']]
     elif record_name is "translationMatrix" or record_name is "rotationMatrix" or \
         record_name is "scaleMatrix" or record_name is "transformationMatrix":
-        # A 4x4 matrix (this may need to be transposed)
-        return np.matrix("""
-                         {} {} {} {};
-                         {} {} {} {};
-                         {} {} {} {};
-                         {} {} {} {}""".format(
-                         record_data['e00'], record_data['e01'], record_data['e02'], record_data['e03'],
+        
+        if matrix_as_flat_vector:
+            return [ record_data['e00'], record_data['e01'], record_data['e02'], record_data['e03'],
                          record_data['e10'], record_data['e11'], record_data['e12'], record_data['e13'],
                          record_data['e20'], record_data['e21'], record_data['e22'], record_data['e23'],
-                         record_data['e30'], record_data['e31'], record_data['e32'], record_data['e33']))
+                         record_data['e30'], record_data['e31'], record_data['e32'], record_data['e33']]
+        else:            
+            # A 4x4 matrix (this may need to be transposed)
+            return np.matrix("""
+                             {} {} {} {};
+                             {} {} {} {};
+                             {} {} {} {};
+                             {} {} {} {}""".format(
+                             record_data['e00'], record_data['e01'], record_data['e02'], record_data['e03'],
+                             record_data['e10'], record_data['e11'], record_data['e12'], record_data['e13'],
+                             record_data['e20'], record_data['e21'], record_data['e22'], record_data['e23'],
+                             record_data['e30'], record_data['e31'], record_data['e32'], record_data['e33']))
         
     print("Could not return {} from {}".format(record_name, record_data))
 
@@ -210,13 +217,35 @@ def get_raw_images(data, image_indices=[0]):
     
     return converted_data
 
+def get_name_class_integer_dictionary(data):
+    """
+    Returns a dictionary of name keys with values representing what class integer
+    to assign the name
+    """
+    class_dictionary = {}
+    found_classes = 0
+    for datum in data:
+        for object_record in datum["objectRecords"]:
+            name = object_record["name"]
+            
+            if name not in class_dictionary:
+                class_dictionary[name] = found_classes
+                found_classes = found_classes + 1
+    
+    return class_dictionary
+
 def get_labels(data, object_records=["translation"], quantize=True, 
-                 one_hot=True, convert_to_tensor=False, record_bound_divisions=[4]):
+                 one_hot=True, convert_to_tensor=False, record_bound_divisions=[4],
+                 convert_name_to_class_integer=True):
     """
     Cutting up convert_data_to_tensors, this will gather the examples without
     any images
     """
     converted_data = []
+    
+    name_class_dictionary = None
+    if convert_name_to_class_integer:
+        name_class_dictionary = get_name_class_integer_dictionary(data)
     
     for datum in data:
         converted_datum = []
@@ -225,13 +254,26 @@ def get_labels(data, object_records=["translation"], quantize=True,
         for object_record in datum['objectRecords']:
             idx = 0 # For determining which divisions to look at
             for object_record_key in object_records:
+                current_record_bound_division = None
+                if quantize:
+                    current_record_bound_division = record_bound_divisions[idx]
+                    
+                
+                
                 # Get the record as a tensorflow readable value, then convert
                 # it to a tensor
-                converted_datum.append(decode_object_record(object_record_key, object_record[object_record_key],
+                decoded_record = decode_object_record(object_record_key, object_record[object_record_key],
                                                             quantize=quantize, 
                                                             one_hot=one_hot,
                                                             convert_to_tensor=convert_to_tensor,
-                                                            record_bound_divisions=record_bound_divisions[idx]))
+                                                            record_bound_divisions=current_record_bound_division)
+                
+                if object_record_key is "name" and convert_name_to_class_integer:
+                    # Convert this name to an integer class 
+                    # TODO: Put this in decode_object_record
+                    decoded_record = name_class_dictionary[decoded_record]
+                
+                converted_datum.append(decoded_record)
                 
                 idx = idx + 1
                 
@@ -313,16 +355,24 @@ def get_combined_labels(labels, record_bound_divisions):
 def write_tfrecord(data, output_filename="train.tfrecords", 
                    object_records=["translation"], quantize=True, 
                    one_hot=True, convert_to_tensor=False, record_bound_divisions=[4],
-                   combine_labels=True):
+                   combine_labels=True,
+                   convert_name_to_class_integer=True,
+                   use_pose=False):
     """
     Writes a tensorflow record to output_filename using the examples and labels
     
     See https://github.com/tensorflow/tensorflow/blob/master/tensorflow/examples/how_tos/reading_data/convert_to_records.py
     and http://machinelearninguru.com/deep_learning/tensorflow/basics/tfrecord/tfrecord.html
     and https://medium.com/mostly-ai/tensorflow-records-what-they-are-and-how-to-use-them-c46bc4bbb564
+    
+    use_pose set to true assumes first label is the class and the second label 
+    is the float list of the transformation matrix
+    use_pose set to False assumes a single label that's a class
     """
     examples = get_raw_images(data)
-    labels = get_labels(data, object_records, quantize, one_hot, record_bound_divisions=record_bound_divisions)
+    labels = get_labels(data, object_records, quantize, one_hot,
+                        record_bound_divisions=record_bound_divisions,
+                        convert_name_to_class_integer=convert_name_to_class_integer)
     
     if combine_labels:
         labels = get_combined_labels(labels, record_bound_divisions)
@@ -330,10 +380,17 @@ def write_tfrecord(data, output_filename="train.tfrecords",
     with tf.python_io.TFRecordWriter(output_filename) as writer:
         for example, label in zip(examples, labels):
             # Create a feature dictionary
-            feature = {
+            if use_pose:
+                feature = {
                         "example" : tf.train.Feature(bytes_list=tf.train.BytesList(value=example)),
-                        "label" :  tf.train.Feature(int64_list=tf.train.Int64List(value=[label]))
+                        "label" :  tf.train.Feature(int64_list=tf.train.Int64List(value=[label[0]])),
+                        "pose" :  tf.train.Feature(float_list=tf.train.FloatList(value=[float(x) for x in label[1]])) # See https://github.com/tensorflow/tensorflow/issues/9554#issuecomment-298761938
                        }
+            else:
+                feature = {
+                            "example" : tf.train.Feature(bytes_list=tf.train.BytesList(value=example)),
+                            "label" :  tf.train.Feature(int64_list=tf.train.Int64List(value=[label]))
+                           }
             
             tf_example = tf.train.Example(features=tf.train.Features(feature=feature))
             
