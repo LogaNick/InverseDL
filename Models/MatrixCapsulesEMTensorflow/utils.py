@@ -16,6 +16,65 @@ import daiquiri
 daiquiri.setup(level=logging.DEBUG)
 logger = daiquiri.getLogger(__name__)
 
+def create_inputs_generated_with_pose_matrix(train, epochs : int, dim=32,
+                                             grayscale=False,
+                                             processed_dir='Models/MatrixCapsulesEMTensorflow/data/generated/translation',):
+    """
+    Fairly large code duplication from create_inputs_generated
+    
+    Basically copying over smallNORB's read_norb_tfrecord but using our
+    tfrecord
+    """
+    
+    filenames = []
+    
+    # TODO: Train vs Test datasets
+    # This code is somewhat copied from create_inputs_norbs
+    if train:
+        prefix = "train"
+    else:
+        prefix = "test"
+    
+    filenames = [os.path.join(processed_dir, fname) for fname in os.listdir(processed_dir) if fname.startswith(prefix)]
+        
+    # Create the file queue
+    filename_queue = tf.train.string_input_producer(filenames, num_epochs=epochs)
+    reader = tf.TFRecordReader()
+    _, serialized_example = reader.read(filename_queue)
+    
+    # Parse single example
+    features = tf.parse_single_example(serialized_example,
+                                   features={
+                                       'example': tf.FixedLenFeature([], tf.string),
+                                       'label': tf.FixedLenFeature([], tf.int64),
+                                       'pose': tf.FixedLenFeature([16], tf.float32)
+                                   })
+    
+    # Decode
+    img = tf.image.decode_png(features['example'], 3)
+    
+    # Reshape, cast
+    img = tf.reshape(img, [dim, dim, 3])
+    
+    # Convert to grayscale if neccessary
+    if grayscale:
+        img = tf.image.rgb_to_grayscale(img)
+    
+    img = tf.cast(img, tf.float32)
+    
+    # Label cast
+    label = features['label']
+    label = tf.cast(label, tf.int32)
+    
+    # The pose matrix
+    pose = features["pose"]
+    pose = tf.cast(pose, tf.float32)
+    pose = tf.reshape(pose, [16])
+    
+    x, y, z = tf.train.shuffle_batch([img, label, pose], num_threads=cfg.num_threads, batch_size=cfg.batch_size, capacity=cfg.batch_size * 64,
+                              min_after_dequeue=cfg.batch_size * 32, allow_smaller_final_batch=False)
+    
+    return x, y, z
 
 def create_inputs_generated(train, epochs : int, dim=32, grayscale=False, processed_dir='Models/MatrixCapsulesEMTensorflow/data/generated/translation'):
     """
@@ -43,10 +102,10 @@ def create_inputs_generated(train, epochs : int, dim=32, grayscale=False, proces
     
     # Parse single example
     features = tf.parse_single_example(serialized_example,
-                                       features={
-                                           'example': tf.FixedLenFeature([], tf.string),
-                                           'label': tf.FixedLenFeature([], tf.int64)
-                                       })
+                                   features={
+                                       'example': tf.FixedLenFeature([], tf.string),
+                                       'label': tf.FixedLenFeature([], tf.int64)
+                                   })
     
     # Decode
     img = tf.image.decode_png(features['example'], 3)

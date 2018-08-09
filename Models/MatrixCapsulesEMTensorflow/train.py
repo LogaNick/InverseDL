@@ -51,10 +51,10 @@ def main(args):
         opt = tf.train.AdamOptimizer()  # lrn_rate
 
         """Get batch from data queue."""
-        batch_x, batch_labels = create_inputs()
+        batch_x, batch_labels, pose_label = create_inputs()
 
         # TODO: GET pose_label FROM batch_labels. Should be shape [batch size, 16]
-        pose_label = pass
+        #pass
 
         # batch_y = tf.one_hot(batch_labels, depth=10, axis=1, dtype=tf.float32)
 
