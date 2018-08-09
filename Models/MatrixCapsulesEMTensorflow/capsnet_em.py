@@ -303,7 +303,30 @@ def build_arch(input, coord_add, is_train: bool, num_classes: int):
 def test_accuracy(logits, labels):
     logits_idx = tf.to_int32(tf.argmax(logits, axis=1))
     logits_idx = tf.reshape(logits_idx, shape=(cfg.batch_size,))
-    correct_preds = tf.equal(tf.to_int32(labels), logits_idx)
+    """Invert correct_preds, so in thi case we will only seeing incorrect predictions
+    
+    e.g. Suppose we have 4 different classes, [0, 1, 2, 3]
+         Now assuming we have
+            labels = [1, 0, 2, 1, 3],
+         but the model predicts as 
+            preds  = [1, 1, 2, 0, 3]
+         ==>
+            correct_preds   = [true, false, true, false, true]
+         ==> 
+            incorrect_preds = [false, true, false, true, false]
+        
+         Here we need to do some operations...:
+            do boolean_mask
+                    distri = tf.boolean_mask(labels, incorrect_preds)
+                           = [0, 1]
+    """
+    labels = tf.to_int32(labels)
+    correct_preds   = tf.equal(labels, logits_idx)
+    incorrect_preds = tf.logical_not(correct_preds)
+    distr = tf.boolean_mask(labels, incorrect_preds)
+    
+    tf.summary.histogram('Incorrect_Predictions_Distribution', distr)
+
     accuracy = tf.reduce_sum(tf.cast(correct_preds, tf.float32)) / cfg.batch_size
 
     return accuracy

@@ -49,3 +49,4 @@ test_logdir
 
 # VS code stuff
 .vscode/*
+export_dir

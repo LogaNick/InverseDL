@@ -9,6 +9,7 @@ flags.DEFINE_float('ac_lambda0', 0.01, '\lambda in the activation function a_c, 
 flags.DEFINE_float('ac_lambda_step', 0.01,
                    'It is described that \lambda increases at each iteration with a fixed schedule, however specific super parameters is absent.')
 
+flags.DEFINE_integer('max_outputs', 50, 'max output image number for image summary')
 flags.DEFINE_integer('batch_size', 50, 'batch size')
 flags.DEFINE_integer('epoch', 75, 'epoch')
 flags.DEFINE_integer('iter_routing', 2, 'number of iterations')
@@ -61,7 +62,10 @@ def get_coord_add(dataset_name: str):
                               [[8., 12.], [12., 12.], [16., 12.], [24., 12.]],
                               [[8., 16.], [12., 16.], [16., 16.], [24., 16.]],
                               [[8., 24.], [12., 24.], [16., 24.], [24., 24.]]], 32.),
-                'rotation_48' : ([], 48.) # Note: comment out coordinate addition
+                'rotation_48' : ([], 48.), # Note: comment out coordinate addition,
+                'rotation_48_animals' : ([], 48.),
+                'animals' : ([], 48),# Note: comment out coordinate addition (this should be 8x8)
+                'animals_rot' : ([], 48) # Note: comment out coordinate addition (this should be 8x8)
                }
     coord_add, scale = options[dataset_name]
 
@@ -73,23 +77,34 @@ def get_coord_add(dataset_name: str):
 def get_dataset_size_train(dataset_name: str):
     options = {'mnist': 55000, 'smallNORB': 23400 * 2,
                'fashion_mnist': 55000, 'cifar10': 50000, 'cifar100': 50000,
-               'translation' : 10201, 'translation_9' : 10201, 'rotation_8' : 8712, 'rotation_48' : 33800}
+               'translation' : 10201, 'translation_9' : 10201,
+               'rotation_8' : 8712, 'rotation_48' : 33800,
+               'rotation_48_animals' : 40368,
+               'animals' : 23542,
+               'animals_rot' : 23608}
     return options[dataset_name]
 
 
 def get_dataset_size_test(dataset_name: str):
     options = {'mnist': 10000, 'smallNORB': 23400 * 2,
                'fashion_mnist': 10000, 'cifar10': 10000, 'cifar10': 10000,
-               'translation' : 121, 'translation_9' : 121, 'rotation_8' : 0, 'rotation_48' : 0}
+               'translation' : 121, 'translation_9' : 121, 'rotation_8' : 0,
+               'rotation_48' : 0, 'rotation_48_animals' : 0,
+               'animals' : 10098,
+               'animals_rot' : 10032}
     return options[dataset_name]
 
 
 def get_num_classes(dataset_name: str):
-    options = {'mnist': 10, 'smallNORB': 5, 'fashion_mnist': 10, 'cifar10': 10, 'cifar100': 100, 'translation' : 4, 'translation_9' : 9, 'rotation_8' : 8, 'rotation_48' : 8}
+    options = {'mnist': 10, 'smallNORB': 5, 'fashion_mnist': 10, 'cifar10': 10,
+               'cifar100': 100, 'translation' : 4, 'translation_9' : 9,
+               'rotation_8' : 8, 'rotation_48' : 8, 'rotation_48_animals' : 8,
+               'animals' : 72,
+               'animals_rot' : 8}
     return options[dataset_name]
 
 
-from Models.MatrixCapsulesEMTensorflow.utils import create_inputs_mnist, create_inputs_norb, create_inputs_cifar10, create_inputs_cifar100, create_inputs_translation
+from Models.MatrixCapsulesEMTensorflow.utils import create_inputs_mnist, create_inputs_norb, create_inputs_cifar10, create_inputs_cifar100, create_inputs_generated
 
 
 def get_create_inputs(dataset_name: str, is_train: bool, epochs: int):
@@ -98,8 +113,14 @@ def get_create_inputs(dataset_name: str, is_train: bool, epochs: int):
                'smallNORB': lambda: create_inputs_norb(is_train, epochs),
                'cifar10': lambda: create_inputs_cifar10(is_train),
                'cifa100': lambda: create_inputs_cifar100(is_train),
-               'translation': lambda: create_inputs_translation(is_train, epochs),
-               'translation_9': lambda: create_inputs_translation(is_train, epochs),
-               'rotation_8': lambda: create_inputs_translation(is_train, epochs),
-               'rotation_48': lambda: create_inputs_translation(is_train, epochs, dim=48)}
+               'translation': lambda: create_inputs_generated(is_train, epochs),
+               'translation_9': lambda: create_inputs_generated(is_train, epochs, processed_dir='Models/MatrixCapsulesEMTensorflow/data/generated/translation_9'),
+               'rotation_8': lambda: create_inputs_generated(is_train, epochs, processed_dir='Models/MatrixCapsulesEMTensorflow/data/generated/rotation_8'),
+               'rotation_48': lambda: create_inputs_generated(is_train, epochs, dim=48, processed_dir='Models/MatrixCapsulesEMTensorflow/data/generated/rotation_48'),
+               'rotation_48_animals' : lambda: create_inputs_generated(is_train, epochs, dim=48, grayscale=True,
+                                                                       processed_dir='Models/MatrixCapsulesEMTensorflow/data/generated/rotation_48_animals'),
+               'animals' : lambda: create_inputs_generated(is_train, epochs, dim=48, grayscale=True,
+                                                                       processed_dir='Models/MatrixCapsulesEMTensorflow/data/generated/animals'),
+               'animals_rot' : lambda: create_inputs_generated(is_train, epochs, dim=48, grayscale=True,
+                                                                       processed_dir='Models/MatrixCapsulesEMTensorflow/data/generated/animals_rot')}
     return options[dataset_name]

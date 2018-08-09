@@ -12,6 +12,4 @@ import Models.MatrixCapsulesEMTensorflow.train as train
 
 #examples, labels = get_examples_labels_from_directory("data_import/data/experiment_0/")
 
-#train.main([None, "rotation_8"])
-
-train_mlp.main([None, ""])
+train.main([None, "animals_rot"])

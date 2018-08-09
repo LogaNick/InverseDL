@@ -25,11 +25,9 @@ public class ExperimentRunner : Experiment {
     public int preRunSteps = 10;
 
     // When using the context menu, we'll save the experiment to this filename
-    [SerializeField]
-    protected string fileName = "data_generation/experiment_0/datum";
+    public string fileName = "data_generation/experiment_0/datum";
 
-    [SerializeField]
-    protected bool recordSceneDuringMyExperiments = true;
+    public bool recordSceneDuringMyExperiments = true;
 
     [ContextMenu("Run Experiments")]
     public void RunExperiments()
@@ -44,7 +42,7 @@ public class ExperimentRunner : Experiment {
         RunExperiments(experiments, sceneRecorder, baseFileName, baseFileName + "_img", steps, recordScene);
     }
 
-    public static void RunExperiments(List<Experiment> experiments, SceneRecorder sceneRecorder, string baseFileName,
+    public void RunExperiments(List<Experiment> experiments, SceneRecorder sceneRecorder, string baseFileName,
         string baseImageFileName, int steps, bool recordScene, ExperimentCallback callback = null)
     {
         int currentStep = 0;
@@ -64,6 +62,13 @@ public class ExperimentRunner : Experiment {
         float percent = currentStep / (float)steps;
         foreach (Experiment experiment in experiments)
         {
+
+            if (currentStep == steps && !experiment.doFinalStep)
+            {
+                // Quit all experiments, exclusive final step. Don't record final scene
+                return;
+            }
+
             experiment.PerformStep(percent, sceneRecorder);
         }
 

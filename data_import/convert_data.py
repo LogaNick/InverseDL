@@ -98,7 +98,7 @@ def quantize_data(data, record_bounds, order=None):
     
     print("Could not place {} into bounds {}".format(data, record_bounds))
     
-    return i
+    return 0
 
 def get_rotation_order(rotation_axis):
     order = [0, 1, 2] # rotX
@@ -118,9 +118,10 @@ def get_record_bounds(record_name, divisions=4, rotation_axis="rotY"):
     order of the dimensions (dimension 0 is dimension 0, 1 is 1, etc)
     """
     order = None
+    epsilon = 0 # Sometimes we want to translate the bounds or make sure we're not within some error
     if record_name is "translation":
-        min_bounds = [-5, -5]
-        max_bounds = [5, 5]
+        min_bounds = [-0.301, -0.301]
+        max_bounds = [0.301, 0.301]
     elif record_name is "eulerAngles":
         min_bounds = [0]
         max_bounds = [360]
@@ -132,6 +133,10 @@ def get_record_bounds(record_name, divisions=4, rotation_axis="rotY"):
     
     num_increments_per_dimension = int(pow(divisions, 1 / bounds_length))
     increment_value = (np.array(max_bounds) - np.array(min_bounds)) / num_increments_per_dimension
+    
+    if record_name is "eulerAngles":
+        # Most rotations will be boundary cases, this will shift the boundary away
+        epsilon = -increment_value / 2.0
     
     # This is the furthest point "left" in each dimension. Anything that is less than this in each dimension is in class 0
     start_bounds = min_bounds + increment_value
@@ -146,7 +151,7 @@ def get_record_bounds(record_name, divisions=4, rotation_axis="rotY"):
     for i in range(divisions):
         bound = start_bounds.copy()
         for j in range(len(current_increment_index)):
-            bound[j] = bound[j] + current_increment_index[j] * increment_value[j]
+            bound[j] = bound[j] + current_increment_index[j] * increment_value[j] + epsilon
         
         bounds.append(bound)
         
@@ -205,7 +210,7 @@ def get_raw_images(data, image_indices=[0]):
     
     return converted_data
 
-def get_examples(data, object_records=["translation"], quantize=True, 
+def get_labels(data, object_records=["translation"], quantize=True, 
                  one_hot=True, convert_to_tensor=False, record_bound_divisions=[4]):
     """
     Cutting up convert_data_to_tensors, this will gather the examples without
@@ -317,7 +322,7 @@ def write_tfrecord(data, output_filename="train.tfrecords",
     and https://medium.com/mostly-ai/tensorflow-records-what-they-are-and-how-to-use-them-c46bc4bbb564
     """
     examples = get_raw_images(data)
-    labels = get_examples(data, object_records, quantize, one_hot, record_bound_divisions=record_bound_divisions)
+    labels = get_labels(data, object_records, quantize, one_hot, record_bound_divisions=record_bound_divisions)
     
     if combine_labels:
         labels = get_combined_labels(labels, record_bound_divisions)

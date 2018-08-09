@@ -25,9 +25,11 @@ def create_tfrecord(directory="data_import/data/experiment_0/",
                     one_hot=True,
                     record_bound_divisions=[4],
                     object_records=["translation"],
-                    combine_labels=True):
+                    combine_labels=True,
+                    recursive=False,
+                    excluded_directories=[]):
     
-    data = from_directory(directory)
+    data = from_directory(directory, True, recursive, excluded_directories)
     write_tfrecord(data, output_filename,  object_records=object_records,
                                            quantize=quantize, 
                                            one_hot=one_hot,
@@ -41,8 +43,11 @@ def create_train_test_records(directory="data_import/data/experiment_0",
                               one_hot=True,
                               record_bound_divisions=[4],
                               object_records=["translation"],
-                              combine_labels=True):
-    data = from_directory(directory)
+                              combine_labels=True,
+                              recursive=False,
+                              excluded_directories=[]):
+    
+    data = from_directory(directory, True, recursive, excluded_directories)
     
     # Create a split
     mask = np.random.choice([True, False], len(data), p=split)
