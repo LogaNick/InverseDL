@@ -46,7 +46,7 @@ def create_inputs_generated_with_pose_matrix(train, epochs : int, dim=32,
     features = tf.parse_single_example(serialized_example,
                                    features={
                                        'example': tf.FixedLenFeature([], tf.string),
-                                       'label': tf.FixedLenFeature([1], tf.int64),
+                                       'label': tf.FixedLenFeature([], tf.int64),
                                        'pose': tf.FixedLenFeature([16], tf.float32)
                                    })
     
