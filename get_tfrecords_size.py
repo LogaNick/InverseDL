@@ -10,9 +10,15 @@ import tensorflow as tf
 i = 0
 l = []
 
-for example in tf.python_io.tf_record_iterator("train.tfrecords"):
+cache_poses = True
+poses = []
+
+for example in tf.python_io.tf_record_iterator("test.tfrecords"):
     i = i + 1
     result = tf.train.Example.FromString(example)
     l.append(result.features.feature['label'].int64_list.value[0])
+    
+    if cache_poses:
+        poses.append(result.features.feature['pose'].float_list.value)
 
 print(i)

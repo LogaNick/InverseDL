@@ -85,7 +85,7 @@ def get_dataset_size_train(dataset_name: str):
                'animals' : 23542,
                'animals_rot' : 23608,
                'animals_translation' : 23634,
-               'animals_pose' : 41948}
+               'animals_pose' : 42114}
     return options[dataset_name]
 
 
@@ -97,7 +97,7 @@ def get_dataset_size_test(dataset_name: str):
                'animals' : 10098,
                'animals_rot' : 10032,
                'animals_translation' : 10006,
-               'animals_pose' : 18052}
+               'animals_pose' : 17886}
     return options[dataset_name]
 
 

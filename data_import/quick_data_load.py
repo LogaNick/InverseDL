@@ -48,9 +48,13 @@ def create_train_test_records(directory="data_import/data/experiment_0",
                               combine_labels=True,
                               recursive=False,
                               excluded_directories=[],
-                              use_pose=False):
+                              use_pose=False,
+                              pre_shuffle_data=True):
     
     data = from_directory(directory, True, recursive, excluded_directories)
+    
+    if pre_shuffle_data:
+        np.random.shuffle(data)
     
     # Create a split
     mask = np.random.choice([True, False], len(data), p=split)
