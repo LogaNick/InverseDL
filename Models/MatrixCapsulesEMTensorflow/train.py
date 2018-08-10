@@ -75,10 +75,12 @@ def main(args):
                 loss, spread_loss, pose_loss, _ = net.spread_loss(
                     output, pose_out, batch_squash, batch_labels, pose_label, m_op)
                 acc = net.test_accuracy(output, batch_labels)
+                threshold_acc = net.threshold_accuracy(pose_out, pose_label)
                 tf.summary.scalar('spread_loss', spread_loss)
                 tf.summary.scalar('pose_loss', pose_loss)
                 tf.summary.scalar('all_loss', loss)
                 tf.summary.scalar('train_acc', acc)
+                tf.summary.scalar('threshold_acc', threshold_acc)
 
             """Compute gradient."""
             grad = opt.compute_gradients(loss)

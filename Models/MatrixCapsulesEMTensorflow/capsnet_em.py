@@ -313,6 +313,28 @@ def test_accuracy(logits, labels):
 
     return accuracy
 
+def threshold_accuracy(pose_out, pose_label, threshold=1e-5):
+    """Converts pose_out to pose_prediction. Then, assumes pose_prediction and pose_label has shape [batch size, 16]. 
+    Counts pose_prediction as accurate if the absolute value of the sum of the differences accross the 16 dimensions is 
+    less than threshold.
+
+    returns number accurate pose_predictions / total predictions
+    """
+
+    # pose prediction loss
+    # Max pose is a 16 dimensional pose matrix for the most activated object class (for each example in the batch)
+    pose_prediction = tf.reduce_max(pose_out, axis=1)
+    assert pose_prediction.get_shape() == [cfg.batch_size, 16]
+
+    absolute_diffs = tf.abs(tf.reduce_sum(tf.subtract(pose_prediction, pose_label), axis=-1))
+    is_less = tf.less(absolute_diffs, threshold)
+    num_correct = tf.reduce_sum(tf.cast(is_less, tf.float32))
+
+    return num_correct / cfg.batch_size
+
+    
+
+
 
 def em_routing(votes, activation, caps_num_c, regularizer, tag=False):
     test = []
