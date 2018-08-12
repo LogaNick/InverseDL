@@ -165,8 +165,12 @@ def main(args):
             tic = time.time()
             """"TF queue would pop batch until no file"""
             try:
-                _, loss_value, summary_str = sess.run(
-                    [train_op, loss, summary_op], feed_dict={m_op: m})
+                if cfg.is_train:
+                    _, loss_value, summary_str = sess.run(
+                        [train_op, loss, summary_op], feed_dict={m_op: m})
+                else:
+                    loss_value, summary_str = sess.run(
+                    [loss, summary_op], feed_dict={m_op: m})
                 logger.info('%d iteration finishs in ' % step + '%f second' %
                             (time.time() - tic) + ' loss=%f' % loss_value)
             except KeyboardInterrupt:
