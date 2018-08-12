@@ -132,7 +132,7 @@ def main(args):
 
         # read snapshot
         if not cfg.is_train:
-            latest = tf.train.latest_checkpoint(os.path.join(cfg.logdir, dataset_name))
+            latest = tf.train.latest_checkpoint(os.path.join(cfg.logdir, 'caps', dataset_name))
             saver.restore(sess, latest)
         """Set summary op."""
         summary_op = tf.summary.merge_all()
@@ -158,6 +158,9 @@ def main(args):
         m_min = 0.2
         m_max = 0.9
         m = m_min
+        if not cfg.is_train:
+          m = m_max
+  
         for step in range(cfg.epoch * num_batches_per_epoch + 1):
             tic = time.time()
             """"TF queue would pop batch until no file"""
