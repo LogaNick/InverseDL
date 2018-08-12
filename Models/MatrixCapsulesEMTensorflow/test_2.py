@@ -36,7 +36,7 @@ def main(args):
         num_batches_per_epoch_train = int(dataset_size_train / cfg.batch_size)
         num_batches_test = int(dataset_size_test / cfg.batch_size)
 
-        batch_x, batch_labels = create_inputs()
+        batch_x, batch_labels, _ = create_inputs()
         batch_x = slim.batch_norm(batch_x, center=False, is_training=False, trainable=False)
         
         output, _ = net.build_arch(batch_x, coord_add,
@@ -60,17 +60,19 @@ def main(args):
             coord = tf.train.Coordinator()
             threads = tf.train.start_queue_runners(sess=sess, coord=coord)
             
-            if not os.path.exists(cfg.test_logdir):
-                os.path.exists(cfg.test_logdir)
+            test_logdir_ = os.path.join(cfg.test_logdir, 'caps', dataset_name)
+            if not os.path.exists(test_logdir_):
+                os.path.exists(test_logdir_)
             summary_writer = tf.summary.FileWriter(
-                cfg.test_logdir, graph=sess.graph)
+                test_logdir_, graph=sess.graph)
 
-            files = os.listdir(cfg.logdir)
+            log_dir_ = os.path.join(cfg.logdir, 'caps', dataset_name)
+            files = os.listdir(log_dir_)
             for epoch in range(1, cfg.epoch):
                 ckpt_re = ".ckpt-%d" % (num_batches_per_epoch_train * epoch)
                 for __file in files:
                     if __file.endswith(ckpt_re + ".index"):
-                        ckpt = os.path.join(cfg.logdir, __file[:-6])
+                        ckpt = os.path.join(log_dir_, __file[:-6])
                 
                 saver.restore(sess, ckpt)
 
