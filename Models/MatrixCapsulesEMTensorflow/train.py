@@ -6,7 +6,7 @@ E-mail: zhangsuofei at njupt.edu.cn | hangyu5 at illinois.edu
 
 import tensorflow as tf
 import tensorflow.contrib.slim as slim
-from Models.MatrixCapsulesEMTensorflow.config import cfg, get_coord_add, get_dataset_size_train, get_num_classes, get_create_inputs
+from Models.MatrixCapsulesEMTensorflow.config import cfg, get_coord_add, get_dataset_size_train, get_dataset_size_test, get_num_classes, get_create_inputs
 import time
 import numpy as np
 import sys
@@ -32,9 +32,12 @@ def main(args):
     tf.set_random_seed(1234)
 
     coord_add = get_coord_add(dataset_name)
-    dataset_size = get_dataset_size_train(dataset_name)
+    if cfg.is_train:
+        dataset_size = get_dataset_size_train(dataset_name)
+    else:
+        dataset_size = get_dataset_size_test(dataset_name)
     num_classes = get_num_classes(dataset_name)
-    create_inputs = get_create_inputs(dataset_name, is_train=True, epochs=cfg.epoch)
+    create_inputs = get_create_inputs(dataset_name, is_train=cfg.is_train, epochs=cfg.epoch)
 
     with tf.Graph().as_default(), tf.device('/cpu:0'):
         """Get global_step."""
@@ -63,8 +66,8 @@ def main(args):
         with tf.device('/gpu:0'):
             with slim.arg_scope([slim.variable], device='/cpu:0'):
                 batch_squash = tf.divide(batch_x, 255.)
-                batch_x = slim.batch_norm(batch_x, center=False, is_training=True, trainable=True)
-                output, pose_out = net.build_arch(batch_x, coord_add, is_train=True,
+                batch_x = slim.batch_norm(batch_x, center=False, is_training=cfg.is_train, trainable=cfg.is_train)
+                output, pose_out = net.build_arch(batch_x, coord_add, is_train=cfg.is_train,
                                                   num_classes=num_classes)
                 # loss = net.cross_ent_loss(output, batch_labels)
                 tf.logging.debug(pose_out.get_shape())
@@ -128,8 +131,9 @@ def main(args):
         logger.info('Trainable Parameters: {}'.format(train_p))
 
         # read snapshot
-        # latest = os.path.join(cfg.logdir, 'model.ckpt-4680')
-        # saver.restore(sess, latest)
+        if not cfg.is_train:
+            latest = tf.train.latest_checkpoint(os.path.join(cfg.logdir, dataset_name))
+            saver.restore(sess, latest)
         """Set summary op."""
         summary_op = tf.summary.merge_all()
 
@@ -138,10 +142,17 @@ def main(args):
         threads = tf.train.start_queue_runners(sess=sess, coord=coord)
 
         """Set summary writer"""
-        if not os.path.exists(cfg.logdir + '/caps/{}/train_log/'.format(dataset_name)):
-            os.makedirs(cfg.logdir + '/caps/{}/train_log/'.format(dataset_name))
+        if cfg.is_train:
+            logdir_ = cfg.logdir,
+            naming = 'train'
+        else:
+            logdir_ = cfg.test_logdir
+            naming = 'test'
+        
+        if not os.path.exists(logdir_ + '/caps/{}/{}_log/'.format(dataset_name, naming)):
+            os.makedirs(logdir_ + '/caps/{}/{}_log/'.format(dataset_name, naming))
         summary_writer = tf.summary.FileWriter(
-            cfg.logdir + '/caps/{}/train_log/'.format(dataset_name), graph=sess.graph)  # graph = sess.graph, huge!
+            logdir_ + '/caps/{}/{}_log/'.format(dataset_name, naming), graph=sess.graph)  # graph = sess.graph, huge!
 
         """Main loop."""
         m_min = 0.2
@@ -175,7 +186,7 @@ def main(args):
 
                     """Save model periodically"""
                     ckpt_path = os.path.join(
-                        cfg.logdir + '/caps/{}/'.format(dataset_name), 'model-{:.4f}.ckpt'.format(loss_value))
+                        logdir_ + '/caps/{}/'.format(dataset_name), 'model-{:.4f}.ckpt'.format(loss_value))
                     saver.save(sess, ckpt_path, global_step=step)
 
 
