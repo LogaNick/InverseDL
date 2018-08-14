@@ -1138,9 +1138,9 @@ MonoBehaviour:
   - {fileID: 1613277489}
   thirdExperiments:
   - {fileID: 993157111}
-  firstExperimentSteps: 28
-  secondExperimentSteps: 28
-  thirdExperimentSteps: 36
+  firstExperimentSteps: 24
+  secondExperimentSteps: 24
+  thirdExperimentSteps: 16
 --- !u!4 &1318311483
 Transform:
   m_ObjectHideFlags: 0
@@ -1275,7 +1275,7 @@ MonoBehaviour:
   - {fileID: 263145820}
   - {fileID: 310992620}
   - {fileID: 1453268174}
-  saveTo: data_generation/experiment_9/
+  saveTo: data_generation/experiment_10/
   experimentRunner: {fileID: 1318311482}
 --- !u!1 &1463994478
 GameObject:

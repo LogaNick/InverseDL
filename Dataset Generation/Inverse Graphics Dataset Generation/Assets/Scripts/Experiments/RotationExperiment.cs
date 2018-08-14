@@ -20,8 +20,6 @@ public class RotationExperiment : Experiment {
         base.PerformStep(percentage, sceneRecorder);
 
         target.rotation = Quaternion.Euler(axis * (startAngle + percentage * (endAngle - startAngle)));
-
-        Debug.Log("Rotated " + name + " to " + percentage);
     }
 
 }
