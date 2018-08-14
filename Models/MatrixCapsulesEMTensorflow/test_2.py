@@ -76,7 +76,6 @@ def main(args):
         summaries.append(tf.summary.scalar('spread_loss', spread_loss))
         summaries.append(tf.summary.scalar('pose_loss', pose_loss))
         summaries.append(tf.summary.scalar('all_loss', loss))
-        summaries.append(tf.summary.scalar('train_acc', acc))
         summaries.append(tf.summary.scalar('threshold_acc_20', threshold_acc_20))
         summaries.append(tf.summary.scalar('threshold_acc_10', threshold_acc_10))
         summaries.append(tf.summary.scalar('threshold_acc_5', threshold_acc_5))
