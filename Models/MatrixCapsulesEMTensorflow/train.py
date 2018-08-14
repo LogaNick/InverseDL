@@ -6,7 +6,7 @@ E-mail: zhangsuofei at njupt.edu.cn | hangyu5 at illinois.edu
 
 import tensorflow as tf
 import tensorflow.contrib.slim as slim
-from Models.MatrixCapsulesEMTensorflow.config import cfg, get_coord_add, get_dataset_size_train, get_num_classes, get_create_inputs
+from Models.MatrixCapsulesEMTensorflow.config import cfg, get_coord_add, get_dataset_size_train, get_dataset_size_test, get_num_classes, get_create_inputs
 import time
 import numpy as np
 import sys
@@ -32,9 +32,12 @@ def main(args):
     tf.set_random_seed(1234)
 
     coord_add = get_coord_add(dataset_name)
-    dataset_size = get_dataset_size_train(dataset_name)
+    if cfg.is_train:
+        dataset_size = get_dataset_size_train(dataset_name)
+    else:
+        dataset_size = get_dataset_size_test(dataset_name)
     num_classes = get_num_classes(dataset_name)
-    create_inputs = get_create_inputs(dataset_name, is_train=True, epochs=cfg.epoch)
+    create_inputs = get_create_inputs(dataset_name, is_train=cfg.is_train, epochs=cfg.epoch)
 
     with tf.Graph().as_default(), tf.device('/cpu:0'):
         """Get global_step."""
@@ -63,8 +66,8 @@ def main(args):
         with tf.device('/gpu:0'):
             with slim.arg_scope([slim.variable], device='/cpu:0'):
                 batch_squash = tf.divide(batch_x, 255.)
-                batch_x = slim.batch_norm(batch_x, center=False, is_training=True, trainable=True)
-                output, pose_out = net.build_arch(batch_x, coord_add, is_train=True,
+                batch_x = slim.batch_norm(batch_x, center=False, is_training=cfg.is_train, trainable=cfg.is_train)
+                output, pose_out = net.build_arch(batch_x, coord_add, is_train=cfg.is_train,
                                                   num_classes=num_classes)
                 # loss = net.cross_ent_loss(output, batch_labels)
                 tf.logging.debug(pose_out.get_shape())
@@ -75,10 +78,27 @@ def main(args):
                 loss, spread_loss, pose_loss, _ = net.spread_loss(
                     output, pose_out, batch_squash, batch_labels, pose_label, m_op)
                 acc = net.test_accuracy(output, batch_labels)
+                threshold_acc_20 = net.threshold_accuracy(pose_out, pose_label, threshold=20)
+                threshold_acc_10 = net.threshold_accuracy(pose_out, pose_label, threshold=10)
+                threshold_acc_5 = net.threshold_accuracy(pose_out, pose_label, threshold=5)
+                threshold_acc_2 = net.threshold_accuracy(pose_out, pose_label, threshold=2)
+                threshold_acc_1 = net.threshold_accuracy(pose_out, pose_label, threshold=1)
+                threshold_acc_half = net.threshold_accuracy(pose_out, pose_label, threshold=0.5)
+                threshold_acc_tenth = net.threshold_accuracy(pose_out, pose_label, threshold=0.1)
+                threshold_acc_hundredth = net.threshold_accuracy(pose_out, pose_label, threshold=0.001)
+                
                 tf.summary.scalar('spread_loss', spread_loss)
                 tf.summary.scalar('pose_loss', pose_loss)
                 tf.summary.scalar('all_loss', loss)
                 tf.summary.scalar('train_acc', acc)
+                tf.summary.scalar('threshold_acc_20', threshold_acc_20)
+                tf.summary.scalar('threshold_acc_10', threshold_acc_10)
+                tf.summary.scalar('threshold_acc_5', threshold_acc_5)
+                tf.summary.scalar('threshold_acc_2', threshold_acc_2)
+                tf.summary.scalar('threshold_acc_1', threshold_acc_1)
+                tf.summary.scalar('threshold_acc_half', threshold_acc_half)
+                tf.summary.scalar('threshold_acc_tenth', threshold_acc_tenth)
+                tf.summary.scalar('threshold_acc_hundredth', threshold_acc_hundredth)
 
             """Compute gradient."""
             grad = opt.compute_gradients(loss)
@@ -111,8 +131,9 @@ def main(args):
         logger.info('Trainable Parameters: {}'.format(train_p))
 
         # read snapshot
-        # latest = os.path.join(cfg.logdir, 'model.ckpt-4680')
-        # saver.restore(sess, latest)
+        if not cfg.is_train:
+            latest = tf.train.latest_checkpoint(os.path.join(cfg.logdir, 'caps', dataset_name))
+            saver.restore(sess, latest)
         """Set summary op."""
         summary_op = tf.summary.merge_all()
 
@@ -121,21 +142,35 @@ def main(args):
         threads = tf.train.start_queue_runners(sess=sess, coord=coord)
 
         """Set summary writer"""
-        if not os.path.exists(cfg.logdir + '/caps/{}/train_log/'.format(dataset_name)):
-            os.makedirs(cfg.logdir + '/caps/{}/train_log/'.format(dataset_name))
+        if cfg.is_train:
+            logdir_ = cfg.logdir,
+            naming = 'train'
+        else:
+            logdir_ = cfg.test_logdir
+            naming = 'test'
+        
+        if not os.path.exists(logdir_ + '/caps/{}/{}_log/'.format(dataset_name, naming)):
+            os.makedirs(logdir_ + '/caps/{}/{}_log/'.format(dataset_name, naming))
         summary_writer = tf.summary.FileWriter(
-            cfg.logdir + '/caps/{}/train_log/'.format(dataset_name), graph=sess.graph)  # graph = sess.graph, huge!
+            logdir_ + '/caps/{}/{}_log/'.format(dataset_name, naming), graph=sess.graph)  # graph = sess.graph, huge!
 
         """Main loop."""
         m_min = 0.2
         m_max = 0.9
         m = m_min
+        if not cfg.is_train:
+          m = m_max
+  
         for step in range(cfg.epoch * num_batches_per_epoch + 1):
             tic = time.time()
             """"TF queue would pop batch until no file"""
             try:
-                _, loss_value, summary_str = sess.run(
-                    [train_op, loss, summary_op], feed_dict={m_op: m})
+                if cfg.is_train:
+                    _, loss_value, summary_str = sess.run(
+                        [train_op, loss, summary_op], feed_dict={m_op: m})
+                else:
+                    loss_value, summary_str = sess.run(
+                    [loss, summary_op], feed_dict={m_op: m})
                 logger.info('%d iteration finishs in ' % step + '%f second' %
                             (time.time() - tic) + ' loss=%f' % loss_value)
             except KeyboardInterrupt:
@@ -158,7 +193,7 @@ def main(args):
 
                     """Save model periodically"""
                     ckpt_path = os.path.join(
-                        cfg.logdir + '/caps/{}/'.format(dataset_name), 'model-{:.4f}.ckpt'.format(loss_value))
+                        logdir_ + '/caps/{}/'.format(dataset_name), 'model-{:.4f}.ckpt'.format(loss_value))
                     saver.save(sess, ckpt_path, global_step=step)
 
 
