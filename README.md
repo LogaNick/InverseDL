@@ -1,6 +1,7 @@
-# InverseDL
+# Can Capsules Estimate Pose?
 
-Deep Learning Inverse Graphics Project
+Deep Learning Inverse Graphics Course Project
+
 
 ## Short Description
 
@@ -8,57 +9,90 @@ Given an image, predict the pose of an object in the image. Data generated in Un
 
 ## Overview
 
-The goal of this project is to use a model (such as a capsule network) to find the transformation matrices of an object in a scene. The scene will be provided as image data that will be generated within the game engine Unity. Labels (transformation matrices or a simplified representation) will also be provided from this data generation. For example, given a scene that consists of a lamp, the model should predict the transformation matrices that describes the lamp’s position, rotation, etc. In the most complicated scenario, the input will be an object O and the output will be the predictions for the **T**ranslation matrix, **R**otation matrix, and **S**cale matrix:
+The goal of this project is to use a capsule network to find the transformation matrices of an object in a scene. Examples and labels are generated using the Unity game engine. A scene is rendering is store as PNG image data that. Scene labels (transformation matrices or a simplified representation) are stored as JSON files. 
+    The model is based off of https://github.com/www0wwwjs1/Matrix-Capsules-EM-Tensorflow 
 
-**O** -> model -> **T, R, S**
 
-The project is easily broken up into iterations that can be attempted in order of complexity. An example of the iterations we could follow:
+## Quick run instructions
 
-1. Produce 2D images of a single Object that only varies in Translation. Train a model on Translation prediction.
-2. Produce 2D images of a single Object that varies in Translation, Rotation, (Scale). Train a model on T,R(,S) prediction.
-3. Move to 3D and try steps 1 and/or 2 again
-4. Add a second object and repeat steps 1-3
-5. Add more objects and repeat 4
-6. A task where there are n Objects in a scene. Given Oi, find the pose (T, R, S) of Oi.
-7. Record video data, train for trajectories/rotations
-8. Determine which objects (or the camera) are moving
+Instructions to run Pose Estimation on Animals dataset
 
-This iterative roadmap provides both the opportunity to study something interesting if a single step proves interesting or becomes too difficult, while also giving guidance on how to progress the project if things go well.
+### Environment Setup
 
-## Milestones
+Go to the root directory of the repository, and enable environment (refer to environment configurations).
 
-1. Produce a general process of generating images of various **T**ranslated, **R**otated, **S**caled **O**bjects. *(June 21 - June 30, ~ 1 week, easy task)*
-2. Replicate and Understand the structure of the Capsule NN. *(July 1 - July 4 , ~ 3, 4 days, likely difficult, start while doing task 1)*
-3. Reconstruct the Capsule NN code and try several toy tests. *(July 5 - July 15, ~ 10 days)*
-4. Revise the code and do various tests. Conclusions. *(July 16 - July 30, ~ 15 days)*
+### Go to the correct branch
 
+```
+git fetch
+git checkout pose_output
+```
+
+### Download ```train.tfrecords``` and ```test.tfrecords```
+Here’s a link to the folder the data is in: https://drive.google.com/open?id=1Fvg_JfviaiRBOJQ9-fVPRHgwkchJAbQc
+
+Save them in ```./Models/MatrixCapsulesEMTensorflow/data/generated/animals_pose``` folder
+
+
+### Run on training set
+
+Remove all the previously existing ckpt files
+```
+rm -rf ./logdir/caps/animals_pose/
+```
+Open to config.py and set ```is_train``` parameter to ```True``` at line 36
+```
+vi Models/MatrixCapsulesEMTensorflow/config.py
+```
+Train the model
+```
+python train_model.py animals_pose
+```
+
+### Run on testing set
+
+Before you run the testing set, you must have several ckpt files exist in ```./logdir```.
+
+Remove all the previously existing ckpt files
+```
+rm -rf ./test_logdir/caps/animals_pose/
+```
+Open to config.py and set ```is_train``` parameter to ```False``` at line 36
+```
+vi Models/MatrixCapsulesEMTensorflow/config.py
+```
+Test the model
+```
+python test_model.py animals_pose
+```
+
+## Data generation instructions
+
+Data generation is done using the Unity engine version 2018.1.6
+
+To generate data for the animals dataset:
+1. Open the Unity project found in “Dataset Generation/Inverse Graphics Dataset Generation”
+2. Open the scene “Scenes/Toys No Lighting Rotation”
+3. Click on the game object “Swap Toys Before Each Experiment Run”
+4. In the inspector, under the “Swap Game Objects Run Experiments” component, change “Save To” to the desired output directory 
+5. Click “Run”
+6. In the inspector, right click the component “Swap Game Objects Run Experiments” to bring up the context menu
+7. In the context menu, click “Run Experiment Runner”
+8. Wait until the data is finished generating
+
+## tfrecords generation instructions
+
+The script “data_import/quick_data_load” provides several convenient functions for creating tfrecords based using the generated data. Below is a script to quickly create train/test tfrecords containing ~70% training data and ~30% testing data.
+
+```
+from data_import.quick_data_load import *
+create_train_test_records("data_import/data/experiment_10/", [0.7, 0.3], False, False, [], ["name", "transformationMatrix"], False, True, [], True)
+```
+## Packages in Anaconda Environment
+
+https://drive.google.com/open?id=1iUacuuydYpqf4mEqelxz22PIjf-AiZKbhttps://drive.google.com/open?id=1iUacuuydYpqf4mEqelxz22PIjf-AiZKb
 
 ## References
 
-6 x 3D Cute Toy Models, PSIONIC GAMES, Unity Asset Store Asset, https://assetstore.unity.com/packages/3d/characters/6-x-3d-cute-toy-models-105033
-Post Processing Stack, Unity Technologies, Unity Asset Store Asset, https://assetstore.unity.com/packages/essentials/post-processing-stack-83912
-
-## Time Log
-
-
-|Description|Time|Group Member|Date|
-|-----------|----|------------|----|
-|Reading papers and learning background topics in graphics (see list in resources)|6h|Nick|Week of June 25|
-|Finding github repos which implemented Dynamic Routing Between Capsules and Matrix Capsules with EM Routing (see links below), forking Matrix Capsules with EM Routing, modifying scripts for mac OS and running it locally.|1h|Nick|Week of June 25|
-|Weekly Meeting|2h|ALL|Week of June 25|
-|Modifying input/output/loss function of Matrix Capsules with EM Routing MNIST implementation to work with synthetic data that Jeff is generating in Unity and to predict pose matrix.|In progress|Nick|Week of July 2|
-|Creating a demo slide which explicitly explain what kind of goals we want to achieve and several approaches that how we can do it.|4h|Xu|Week of June 25|
-|Reading “Matrix capsules with EM routing” and “Dynamic Routing Between Capsules”|3h|Xu|June 30th|
-|Finding a “Capsule Network” repo based on “MNIST” dataset on github and run it. |1h (>3 training)|Xu|June 26th|
-|Reading "Matrix capsules with EM routing" and "Dynamic Routing Between Capsules" and "Transforming Auto-encoders"  |4h|Jeff|June 23rd|
-|Reading PoseCNN|1.5h|Jeff|June 25th|
-|Setting up base pipeline to export data from Unity, including generating test translation data|5h|Jeff|June 25th|
-|Loading data into Python|2h|Jeff|June 27th|
-|Pipeline - Formatting data in Python for TF |2h|Jeff|July 2nd|
-|Pipeline - One-hot and quantization of translation labels |2.25h |Jeff|July 16th|
-|Pipeline - Trying to hack in tf tensors for inputs |3.25h |Jeff|July 17th-19th|
-|Pipeline/Meeting with Nick - Creating tfrecords for input |4h |Jeff|July 20th|
-|Pipeline - Data import with tfrecord |1.5h |Jeff|July 23rd|
-|Meeting (all hands) - More pipeline work, planning future |2.75h |Jeff|July 23rd|
-|Code cleanup |1.75h |Jeff|July 24th|
+6 x 3D Cute Toy Models, PSIONIC GAMES, Unity Asset Store Asset, https://assetstore.unity.com/packages/3d/characters/6-x-3d-cute-toy-models-105033 Post Processing Stack, Unity Technologies, Unity Asset Store Asset, https://assetstore.unity.com/packages/essentials/post-processing-stack-83912
 
