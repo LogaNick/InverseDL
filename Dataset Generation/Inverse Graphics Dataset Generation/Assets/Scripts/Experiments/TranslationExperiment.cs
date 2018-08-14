@@ -41,8 +41,6 @@ public class TranslationExperiment : Experiment {
         }
 
         target.transform.position = newPosition;
-
-        Debug.Log("Moved " + name + " from " + originalPos + " to " + newPosition + ". Percentage: " + percentage);
     }
 
     /// <summary>

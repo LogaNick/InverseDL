@@ -26,6 +26,12 @@ public class SwitchGameObjectsRunExperiment : MonoBehaviour {
 
             go.SetActive(true);
 
+            // Set the name of the parent object so we can get different classes
+            if(go.transform.parent)
+            {
+                go.transform.parent.name = go.name;
+            }
+
             SetExperimentsFileNameRecursively(experimentRunner,  saveTo + "/" +go.name + "/");
 
             experimentRunner.RunExperiments();
