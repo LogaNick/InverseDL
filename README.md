@@ -90,8 +90,7 @@ create_train_test_records("data_import/data/experiment_10/", [0.7, 0.3], False, 
 ```
 ## Packages in Anaconda Environment
 
-https://drive.google.com/open?id=1iUacuuydYpqf4mEqelxz22PIjf-AiZKbhttps://drive.google.com/open?id=1iUacuuydYpqf4mEqelxz22PIjf-AiZKb
-
+(dependencies.txt)
 ## References
 
 6 x 3D Cute Toy Models, PSIONIC GAMES, Unity Asset Store Asset, https://assetstore.unity.com/packages/3d/characters/6-x-3d-cute-toy-models-105033 Post Processing Stack, Unity Technologies, Unity Asset Store Asset, https://assetstore.unity.com/packages/essentials/post-processing-stack-83912
