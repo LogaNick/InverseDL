@@ -1,0 +1,81 @@
+# packages in environment at /users/visitor/dscs49001/anaconda3/envs/mcemr:
+#
+# Name                    Version                   Build  Channel
+argh                      0.26.2                    <pip>
+backports                 1.0                      py36_1    anaconda
+backports.weakref         1.0rc1                   py36_0    anaconda
+blas                      1.0                    openblas  
+bleach                    1.5.0                    py36_0    anaconda
+bzip2                     1.0.6                h14c3975_5    anaconda
+ca-certificates           2018.03.07           hf82bc7d_0  
+cairo                     1.14.12              h8948797_3    anaconda
+certifi                   2018.4.16                py36_0  
+cudatoolkit               8.0                           0    anaconda
+cudnn                     6.0.21                        0    anaconda
+cycler                    0.10.0                   py36_0  
+daiquiri                  1.5.0                     <pip>
+ffmpeg                    3.4                  h7985aa0_0    anaconda
+fontconfig                2.13.0               h9420a91_0    anaconda
+freeglut                  3.0.0                hf484d3e_5    anaconda
+freetype                  2.9.1                h8a8886c_0  
+glib                      2.56.1               hdbcaa40_0    anaconda
+graphite2                 1.3.11               h16798f4_2    anaconda
+h5py                      2.8.0            py36h8d01980_0  
+harfbuzz                  1.7.6                hec2c2bc_3    anaconda
+hdf5                      1.10.2               hba1933b_1  
+html5lib                  0.9999999                py36_0    anaconda
+icu                       58.2                 h64fc554_1  
+jasper                    2.0.14               h07fcdf6_1    anaconda
+jpeg                      9b                   hcb7ba68_2    anaconda
+keras-applications        1.0.2                    py36_0  
+keras-base                2.2.0                    py36_0  
+keras-preprocessing       1.0.1                    py36_0  
+kiwisolver                1.0.1            py36hf484d3e_0  
+libedit                   3.1.20170329         h6b74fdf_2  
+libffi                    3.2.1                hf62a594_5  
+libgcc-ng                 7.2.0                h7cc24e2_2  
+libgfortran-ng            7.2.0                h9f7466a_2  
+libglu                    9.0.0                hf484d3e_1    anaconda
+libopenblas               0.2.20               h9ac9557_7  
+libopencv                 3.4.1                h8fa1ad8_3    anaconda
+libopus                   1.2.1                h14c3975_0    anaconda
+libpng                    1.6.32               h288d48a_4  
+libprotobuf               3.5.2                hdbcaa40_0    anaconda
+libstdcxx-ng              7.2.0                h7a57d05_2  
+libtiff                   4.0.9                he85c1e1_1    anaconda
+libuuid                   1.0.3                h1bed415_2    anaconda
+libvpx                    1.7.0                hf484d3e_0    anaconda
+libxcb                    1.13                 h1bed415_0    anaconda
+libxml2                   2.9.8                h26e45fe_1    anaconda
+markdown                  2.6.11                   py36_0    anaconda
+matplotlib                2.2.2            py36hb69df0a_2  
+ncurses                   6.1                  hf484d3e_0  
+numpy                     1.14.5           py36h2aefc1b_4    anaconda
+numpy-base                1.14.5           py36h2b20989_4    anaconda
+opencv                    3.4.1            py36h6fd60c2_3  
+openssl                   1.0.2o               h20670df_0  
+pcre                      8.42                 hf484d3e_0    anaconda
+pip                       18.0                      <pip>
+pip                       10.0.1                   py36_0    anaconda
+pixman                    0.34.0               h1f8d8dc_3    anaconda
+profilehooks              1.10.0                    <pip>
+protobuf                  3.5.2            py36hf484d3e_1    anaconda
+py-opencv                 3.4.1            py36hfa22a86_3    anaconda
+pyparsing                 2.2.0                    py36_1  
+python                    3.6.6                h78a52d1_0    anaconda
+python-dateutil           2.7.3                    py36_0  
+pytz                      2018.5                   py36_0  
+pyyaml                    3.13             py36h14c3975_0  
+readline                  7.0                  h1bed415_4  
+scipy                     1.1.0            py36h9c1e066_0  
+setuptools                39.2.0                   py36_0    anaconda
+six                       1.11.0                   py36_1    anaconda
+sqlite                    3.24.0               h84994c4_0  
+tensorflow-gpu            1.2.1           py36cuda8.0cudnn6.0_0    anaconda
+tk                        8.6.7                hb4a6f0b_3  
+tornado                   5.0.2            py36h14c3975_0  
+werkzeug                  0.14.1                   py36_0    anaconda
+wheel                     0.31.1                   py36_0    anaconda
+xz                        5.2.4                h14c3975_4  
+yaml                      0.1.7                h1bed415_2  
+zlib                      1.2.11               hb9fc6fc_2  
